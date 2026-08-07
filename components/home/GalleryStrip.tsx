@@ -1,3 +1,4 @@
+'use client';
 import Image from 'next/image';
 import { Reveal } from '@/components/Reveal';
 import { motion } from 'framer-motion';
