@@ -23,13 +23,12 @@ export async function verifyKkiapayTransaction(transactionId: string) {
   return data as { status: string; amount?: number; [key: string]: unknown };
 }
 
-/** Génère un code de billet unique, lisible, difficile à deviner. */
-export function generateTicketCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // sans caractères ambigus
-  let code = 'JAF-';
-  for (let i = 0; i < 8; i++) {
-    if (i === 4) code += '-';
-    code += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return code;
+/**
+ * Formate le code d'un billet à partir du préfixe de la catégorie et de son
+ * numéro séquentiel dans le segment qui lui est réservé.
+ * Ex: catégorie "VIP" (préfixe) + numéro 7 → "JAF-VIP-0007"
+ */
+export function formatTicketCode(prefix: string, ticketNumber: number): string {
+  const padded = String(ticketNumber).padStart(4, '0');
+  return `JAF-${prefix}-${padded}`;
 }

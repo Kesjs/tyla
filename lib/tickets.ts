@@ -12,6 +12,9 @@ export type TicketCategory = {
   sold_count: number;
   display_order: number;
   active: boolean;
+  code_prefix: string;
+  segment_start: number;
+  next_ticket_number: number;
 };
 
 export type ContactInfo = {

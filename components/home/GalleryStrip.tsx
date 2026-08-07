@@ -1,7 +1,9 @@
 'use client';
+
 import Image from 'next/image';
 import { Reveal } from '@/components/Reveal';
-import { motion } from 'framer-motion';
+import { motion, useAnimationControls } from 'framer-motion';
+import { useState } from 'react';
 
 const GALLERY = [
   { src: '/images/backstage-01.jpg', alt: 'Backstage T.Y.L.A' },
@@ -9,25 +11,28 @@ const GALLERY = [
   { src: '/images/backstage-02.jpg', alt: 'Coulisses défilé' },
   { src: '/images/podium-maison-ipso.jpg', alt: 'Podium Maison Ipso' },
   { src: '/images/committee-award.jpg', alt: 'Remerciements équipe T.Y.L.A' },
-  { src: '/images/DSCF1413 (1).jpg', alt: 'Coulisses T.Y.L.A' },
+  { src: '/images/DSCF1413-1-.jpg', alt: 'Coulisses T.Y.L.A' },
   { src: '/images/DSC_7618.jpg', alt: 'Préparation défilé' },
-  { src: '/images/DSC_7657.jpg', alt: 'Backstage moments' },
-  { src: '/images/DSC_7659.jpg', alt: 'Équipe T.Y.L.A' },
-  { src: '/images/DSC_7690.jpg', alt: 'Coulisses créatives' },
-  { src: '/images/DSC_7913 (1).jpg', alt: 'Moments défilé' },
-  { src: '/images/DSC_7913 (2).jpg', alt: 'Fashion week backstage' },
-  { src: '/images/DSC_7977.jpg', alt: 'Création T.Y.L.A' },
-  { src: '/images/IMG_2522.JPEG', alt: 'Événement T.Y.L.A' },
-  { src: '/images/IMG_2532.JPEG', alt: 'Scène T.Y.L.A' },
+  { src: '/images/DSC_7913-1-.jpg', alt: 'Moments défilé' },
+  { src: '/images/img-2522.jpg', alt: 'Événement T.Y.L.A' },
+  { src: '/images/img-2532.jpg', alt: 'Scène T.Y.L.A' },
 ];
 
-// Dupliquer la galerie pour le défilement infini (2 copies pour boucle fluide)
+// Dupliquée pour la boucle infinie (2 copies pour un défilement continu sans coupure)
 const INFINITE_GALLERY = [...GALLERY, ...GALLERY];
 
 export function GalleryStrip() {
-  const cardWidth = 200; // Largeur de base
-  const cardWidthMd = 260; // Largeur sur desktop
-  const gap = 16; // gap-4 = 16px
+  const cardWidth = 200;
+  const gap = 16;
+  const controls = useAnimationControls();
+  const [started, setStarted] = useState(false);
+
+  function startLoop() {
+    controls.start({
+      x: [0, -((cardWidth + gap) * GALLERY.length)],
+      transition: { x: { repeat: Infinity, repeatType: 'loop', duration: 50, ease: 'linear' } },
+    });
+  }
 
   return (
     <section className="bg-noir py-20 md:py-28">
@@ -42,40 +47,36 @@ export function GalleryStrip() {
         </Reveal>
       </div>
 
-      <Reveal delay={0.15}>
-        <div className="overflow-hidden py-4">
-          <motion.div
-            className="flex gap-4"
-            animate={{
-              x: [0, -((cardWidth + gap) * GALLERY.length)],
-            }}
-            transition={{
-              x: {
-                repeat: Infinity,
-                repeatType: "loop",
-                duration: 50,
-                ease: "linear",
-              },
-            }}
-          >
-            {INFINITE_GALLERY.map((img, i) => (
-              <div
-                key={`${img.src}-${i}`}
-                className="relative h-[280px] w-[200px] flex-shrink-0 overflow-hidden md:w-[260px]"
-              >
-                <Image
-                  src={img.src}
-                  alt={img.alt}
-                  fill
-                  className="object-cover transition-transform duration-700 hover:scale-105"
-                  sizes="(max-width: 768px) 200px, 260px"
-                  priority={i < 4} // Priorité aux premières images
-                />
-              </div>
-            ))}
-          </motion.div>
-        </div>
-      </Reveal>
+      {/* Piste de défilement : anime seulement quand visible, en pause au survol */}
+      <motion.div
+        className="overflow-hidden py-4"
+        viewport={{ once: false, amount: 0.1 }}
+        onViewportEnter={() => {
+          setStarted(true);
+          startLoop();
+        }}
+        onViewportLeave={() => controls.stop()}
+        onMouseEnter={() => controls.stop()}
+        onMouseLeave={() => started && startLoop()}
+      >
+        <motion.div className="flex gap-4" animate={controls} initial={{ x: 0 }}>
+          {INFINITE_GALLERY.map((img, i) => (
+            <div
+              key={`${img.src}-${i}`}
+              className="relative h-[280px] w-[200px] flex-shrink-0 overflow-hidden md:w-[260px]"
+            >
+              <Image
+                src={img.src}
+                alt={img.alt}
+                fill
+                className="object-cover transition-transform duration-700 hover:scale-105"
+                sizes="(max-width: 768px) 200px, 260px"
+                loading={i < 2 ? 'eager' : 'lazy'}
+              />
+            </div>
+          ))}
+        </motion.div>
+      </motion.div>
     </section>
   );
 }

@@ -76,6 +76,19 @@ lib/
 middleware.ts                → Protection des routes /admin
 ```
 
+## Numérotation des billets
+
+Chaque catégorie a son propre **segment de numéros séquentiels**, sans chevauchement :
+- VIP Prestige : VIP-0001 → VIP-0010
+- VIP Gold : GLD-0101 → GLD-0140
+- Standard : STD-0301 → STD-0450
+- Étudiant : ETU-0601 → ETU-0700
+
+Modifiable dans `/admin/billets` (préfixe + numéro de départ du segment par
+catégorie). L'attribution des numéros est atomique côté base de données
+(fonction `tyla_reserve_ticket_numbers`) : deux achats simultanés ne peuvent
+jamais recevoir le même numéro.
+
 ## Base de données (Supabase, tables `tyla_*`)
 
 - `tyla_ticket_categories` — catégories, prix, quotas, statut Early Bird

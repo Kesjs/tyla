@@ -27,6 +27,7 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
   const [quantity, setQuantity] = useState(1);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [phoneError, setPhoneError] = useState('');
   const [email, setEmail] = useState('');
   const [step, setStep] = useState<'pick' | 'form' | 'paying' | 'error'>('pick');
   const [errorMsg, setErrorMsg] = useState('');
@@ -50,6 +51,33 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
     setErrorMsg('');
   }
 
+  /** Formate la saisie en groupes de 2 chiffres pendant la frappe (XX XX XX XX), 8 chiffres max. */
+  function handlePhoneChange(raw: string) {
+    const digitsOnly = raw.replace(/\D/g, '').slice(0, 8);
+    const grouped = digitsOnly.replace(/(\d{2})(?=\d)/g, '$1 ');
+    setPhone(grouped);
+    if (phoneError) setPhoneError('');
+  }
+
+  /**
+   * Valide le numéro local béninois : exactement 8 chiffres, saisis après le
+   * préfixe fixe +229 (01). Retourne un message d'erreur clair si invalide,
+   * ou une chaîne vide si le numéro est correct.
+   */
+  function validatePhone(value: string): string {
+    const digitsOnly = value.replace(/\D/g, '');
+    if (digitsOnly.length === 0) {
+      return 'Merci de renseigner votre numéro Mobile Money.';
+    }
+    if (digitsOnly.length < 8) {
+      return `Numéro incomplet — il manque ${8 - digitsOnly.length} chiffre(s) (8 chiffres attendus après +229 (01)).`;
+    }
+    if (digitsOnly.length > 8) {
+      return 'Numéro trop long — seuls 8 chiffres sont attendus après +229 (01).';
+    }
+    return '';
+  }
+
   function pick(cat: TicketCategory) {
     setSelected(cat);
     setQuantity(1);
@@ -62,6 +90,15 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
     if (!selected) return;
     setErrorMsg('');
 
+    const phoneValidationError = validatePhone(phone);
+    if (phoneValidationError) {
+      setPhoneError(phoneValidationError);
+      return;
+    }
+
+    const digitsOnly = phone.replace(/\D/g, '');
+    const fullPhone = `+229 01 ${digitsOnly.slice(0, 2)} ${digitsOnly.slice(2, 4)} ${digitsOnly.slice(4, 6)} ${digitsOnly.slice(6, 8)}`;
+
     const res = await fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -69,7 +106,7 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
         categoryId: selected.id,
         quantity,
         buyerName: name,
-        buyerPhone: phone,
+        buyerPhone: fullPhone,
         buyerEmail: email,
       }),
     });
@@ -94,7 +131,7 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
           key: process.env.NEXT_PUBLIC_KKIAPAY_PUBLIC_KEY,
           sandbox: true, // ⚠️ passer à false une fois le compte Kkiapay validé en production
           data: JSON.stringify({ orderId: data.orderId }),
-          phone,
+          phone: `22901${phone.replace(/\D/g, '')}`,
           email,
           name,
         });
@@ -248,16 +285,29 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
                 <div className="flex items-center gap-2 border-b border-taupe bg-noir-soft px-4 py-2.5">
                   <span className="text-xl">🇧🇯</span>
                   <span className="font-body text-sm text-ivoire/70">+229</span>
+                  <span className="font-body text-sm text-or/70">(01)</span>
                 </div>
                 <input
                   required
                   type="tel"
+                  inputMode="numeric"
                   placeholder="XX XX XX XX"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="flex-1 border-b border-taupe bg-transparent py-2.5 pl-4 font-body text-ivoire outline-none focus:border-or"
+                  onChange={(e) => handlePhoneChange(e.target.value)}
+                  onBlur={() => setPhoneError(validatePhone(phone))}
+                  aria-invalid={!!phoneError}
+                  className={`flex-1 border-b bg-transparent py-2.5 pl-4 font-body text-ivoire outline-none ${
+                    phoneError ? 'border-porto focus:border-porto' : 'border-taupe focus:border-or'
+                  }`}
                 />
               </div>
+              {phoneError ? (
+                <p className="mt-2 font-body text-xs text-porto-light">{phoneError}</p>
+              ) : (
+                <p className="mt-2 font-body text-xs text-ivoire/30">
+                  8 chiffres, sans le 01 (ex : 97 12 34 56)
+                </p>
+              )}
             </div>
             <div>
               <label className="font-body text-xs uppercase tracking-[0.2em] text-ivoire/50">Email</label>

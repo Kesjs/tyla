@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { verifyKkiapayTransaction, generateTicketCode } from '@/lib/kkiapay';
+import { verifyKkiapayTransaction, formatTicketCode } from '@/lib/kkiapay';
 
 export async function POST(req: NextRequest) {
   try {
@@ -56,14 +56,40 @@ export async function POST(req: NextRequest) {
       })
       .eq('id', orderId);
 
-    // Génération d'un billet (avec code unique) par place achetée
-    const ticketsToInsert = Array.from({ length: order.quantity }).map(() => ({
-      order_id: order.id,
-      category_id: order.category_id,
-      ticket_code: generateTicketCode(),
-      buyer_name: order.buyer_name,
-      buyer_email: order.buyer_email,
-    }));
+    // Récupère le préfixe de la catégorie pour formater les codes
+    const { data: cat } = await supabase
+      .from('tyla_ticket_categories')
+      .select('code_prefix, sold_count')
+      .eq('id', order.category_id)
+      .single();
+
+    if (!cat) {
+      return NextResponse.json({ error: 'Catégorie de billet introuvable.' }, { status: 500 });
+    }
+
+    // Réserve atomiquement un bloc de N numéros consécutifs dans le segment
+    // de cette catégorie (évite toute collision entre commandes simultanées)
+    const { data: startNumber, error: reserveError } = await supabase.rpc(
+      'tyla_reserve_ticket_numbers',
+      { p_category_id: order.category_id, p_count: order.quantity }
+    );
+
+    if (reserveError || startNumber === null) {
+      return NextResponse.json({ error: 'Paiement confirmé mais erreur lors de la génération des billets — contactez benin@tylafrica.com.' }, { status: 500 });
+    }
+
+    // Génération d'un billet par place achetée, avec numéro séquentiel dans le segment réservé
+    const ticketsToInsert = Array.from({ length: order.quantity }).map((_, i) => {
+      const ticketNumber = startNumber + i;
+      return {
+        order_id: order.id,
+        category_id: order.category_id,
+        ticket_number: ticketNumber,
+        ticket_code: formatTicketCode(cat.code_prefix, ticketNumber),
+        buyer_name: order.buyer_name,
+        buyer_email: order.buyer_email,
+      };
+    });
 
     const { data: tickets, error: ticketsError } = await supabase
       .from('tyla_tickets')
@@ -75,18 +101,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Incrémente le compteur de billets vendus sur la catégorie
-    const { data: cat } = await supabase
+    await supabase
       .from('tyla_ticket_categories')
-      .select('sold_count')
-      .eq('id', order.category_id)
-      .single();
-
-    if (cat) {
-      await supabase
-        .from('tyla_ticket_categories')
-        .update({ sold_count: cat.sold_count + order.quantity })
-        .eq('id', order.category_id);
-    }
+      .update({ sold_count: cat.sold_count + order.quantity })
+      .eq('id', order.category_id);
 
     return NextResponse.json({ tickets });
   } catch (err) {

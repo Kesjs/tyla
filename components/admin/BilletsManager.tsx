@@ -21,22 +21,32 @@ export function BilletsManager({ initialCategories }: { initialCategories: Ticke
   async function saveCategory(cat: TicketCategory) {
     setSavingId(cat.id);
     const supabase = createClient();
-    await supabase
-      .from('tyla_ticket_categories')
-      .update({
-        name: cat.name,
-        description: cat.description,
-        included_items: cat.included_items,
-        price_early_bird: cat.price_early_bird,
-        price_normal: cat.price_normal,
-        quota_early_bird: cat.quota_early_bird,
-        quota_total: cat.quota_total,
-        is_early_bird_active: cat.is_early_bird_active,
-        active: cat.active,
-        display_order: cat.display_order,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', cat.id);
+
+    const payload: Record<string, any> = {
+      name: cat.name,
+      description: cat.description,
+      included_items: cat.included_items,
+      price_early_bird: cat.price_early_bird,
+      price_normal: cat.price_normal,
+      quota_early_bird: cat.quota_early_bird,
+      quota_total: cat.quota_total,
+      is_early_bird_active: cat.is_early_bird_active,
+      active: cat.active,
+      display_order: cat.display_order,
+      code_prefix: cat.code_prefix,
+      segment_start: cat.segment_start,
+      updated_at: new Date().toISOString(),
+    };
+
+    // Si aucun billet n'a encore été vendu dans cette catégorie, on peut
+    // aligner le compteur sur le nouveau départ de segment sans risque de
+    // doublon. Si des billets existent déjà, on ne touche pas au compteur
+    // pour ne jamais réattribuer un numéro déjà émis.
+    if (cat.sold_count === 0) {
+      payload.next_ticket_number = cat.segment_start;
+    }
+
+    await supabase.from('tyla_ticket_categories').update(payload).eq('id', cat.id);
     setSavingId(null);
     router.refresh();
   }
@@ -61,6 +71,9 @@ export function BilletsManager({ initialCategories }: { initialCategories: Ticke
         quota_early_bird: 0,
         quota_total: 0,
         display_order: categories.length + 1,
+        code_prefix: 'NEW',
+        segment_start: 9000,
+        next_ticket_number: 9000,
       })
       .select()
       .single();
@@ -125,6 +138,39 @@ export function BilletsManager({ initialCategories }: { initialCategories: Ticke
                 className="w-full border-b border-taupe bg-transparent py-2 font-body text-ivoire outline-none focus:border-or"
               />
             </Field>
+          </div>
+
+          <div className="mt-5 border-t border-taupe/20 pt-5">
+            <p className="font-body text-[11px] uppercase tracking-[0.15em] text-or/70">
+              Numérotation des billets (segment dédié, sans chevauchement entre catégories)
+            </p>
+            <div className="mt-3 grid gap-5 sm:grid-cols-3">
+              <Field label="Préfixe (ex: VIP, GLD)">
+                <input
+                  value={cat.code_prefix}
+                  onChange={(e) => updateField(cat.id, 'code_prefix', e.target.value.toUpperCase())}
+                  maxLength={6}
+                  className="w-full border-b border-taupe bg-transparent py-2 font-body uppercase text-ivoire outline-none focus:border-or"
+                />
+              </Field>
+              <Field label="Numéro de départ du segment">
+                <input
+                  type="number"
+                  value={cat.segment_start}
+                  onChange={(e) => updateField(cat.id, 'segment_start', Number(e.target.value))}
+                  className="w-full border-b border-taupe bg-transparent py-2 font-body text-ivoire outline-none focus:border-or"
+                />
+              </Field>
+              <Field label="Prochain numéro à attribuer (lecture seule)">
+                <p className="border-b border-transparent py-2 font-body text-ivoire/50">
+                  {cat.next_ticket_number}
+                </p>
+              </Field>
+            </div>
+            <p className="mt-2 font-body text-[11px] text-ivoire/40">
+              Ex : {cat.code_prefix || 'PREFIX'}-{String(cat.segment_start).padStart(4, '0')} sera le premier billet de cette catégorie.
+              Laissez un écart suffisant entre le départ de chaque catégorie (ex : 1, 101, 301, 601…) pour qu&apos;aucun segment ne chevauche un autre.
+            </p>
           </div>
 
           <div className="mt-6 flex flex-wrap items-center gap-6">
