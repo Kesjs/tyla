@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #0A0A0A;
+  color: #F5F0E8;
+}
+
+::selection {
+  background-color: #D39F2D;
+  color: #0A0A0A;
+}
+
+/* Fine gold hairline separator */
+.hairline-or {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #D39F2D, transparent);
+}
+
+/* Signature gold frame corner marks — the T.Y.L.A visual signature */
+.gold-frame {
+  position: relative;
+}
+.gold-frame::before,
+.gold-frame::after {
+  content: '';
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #D39F2D;
+  opacity: 0.9;
+}
+.gold-frame::before {
+  top: -10px;
+  left: -10px;
+  border-right: none;
+  border-bottom: none;
+}
+.gold-frame::after {
+  bottom: -10px;
+  right: -10px;
+  border-left: none;
+  border-top: none;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Custom scrollbar, subtle */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0A0A0A;
+}
+::-webkit-scrollbar-thumb {
+  background: #3A322C;
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D39F2D;
+}
