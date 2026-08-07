@@ -13,14 +13,7 @@ const VALUES = [
   'Solidarité', 'Empowerment', 'Engagement communautaire', 'Unité',
 ];
 
-const COMMITTEE = [
-  { name: 'Tatiana Monteiro', role: 'Présidente' },
-  { name: 'Myriam Tsumbu Nzanzala', role: 'Vice-Présidente' },
-  { name: 'Ismael Kane', role: 'Trésorier' },
-  { name: 'Eunice Tchibozo', role: 'Resp. Projet et Développement' },
-  { name: 'Benedicte Okonda', role: 'Secrétaire Générale' },
-  { name: 'Julia Lavenette', role: 'Responsable Média' },
-];
+
 
 export default function AssociationPage() {
   return (
@@ -118,29 +111,6 @@ export default function AssociationPage() {
               ))}
             </div>
           </Reveal>
-        </div>
-      </section>
-
-      {/* Comité */}
-      <section className="bg-noir py-24 md:py-32">
-        <div className="mx-auto max-w-6xl px-6 md:px-10">
-          <Reveal className="text-center">
-            <p className="font-body text-xs uppercase tracking-[0.35em] text-or">L&apos;équipe</p>
-            <h2 className="mt-5 font-display text-3xl font-semibold text-ivoire sm:text-4xl">Le Comité</h2>
-          </Reveal>
-          <div className="mt-16 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
-            {COMMITTEE.map((m, i) => (
-              <Reveal key={m.name} delay={i * 0.08}>
-                <div className="text-center">
-                  <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-or/40 font-display text-lg text-or">
-                    {m.name.split(' ').map((n) => n[0]).slice(0, 2).join('')}
-                  </div>
-                  <p className="mt-4 font-display text-base font-semibold text-ivoire">{m.name}</p>
-                  <p className="mt-1 font-body text-xs uppercase tracking-[0.15em] text-ivoire/50">{m.role}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
         </div>
       </section>
 

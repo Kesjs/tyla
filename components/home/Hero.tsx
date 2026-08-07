@@ -26,7 +26,7 @@ export function Hero() {
         transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
       >
         <Image
-          src="/images/backstage-01.jpg"
+          src="/images/committee-award.jpg"
           alt="Défilé T.Y.L.A J'AFFIRME"
           fill
           priority
@@ -68,7 +68,7 @@ export function Hero() {
         <motion.div variants={item} className="relative mt-6">
           <span className="pointer-events-none absolute -inset-x-8 -inset-y-6 border border-or/70 sm:-inset-x-14 sm:-inset-y-10" />
           <h1 className="font-display text-[3.2rem] font-semibold leading-[0.95] tracking-tight text-ivoire sm:text-8xl md:text-9xl">
-            J&apos;AFFIRME
+            J&apos;AFFIRME !
           </h1>
         </motion.div>
 

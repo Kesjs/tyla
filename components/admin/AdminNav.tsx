@@ -3,13 +3,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Ticket, MessageSquare, LogOut, QrCode } from 'lucide-react';
+import { LayoutDashboard, Ticket, MessageSquare, LogOut, QrCode, Users } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 const LINKS = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/billets', label: 'Billets', icon: Ticket },
   { href: '/admin/commandes', label: 'Commandes & Check-in', icon: QrCode },
+  { href: '/admin/committee', label: 'Comité', icon: Users },
   { href: '/admin/contact', label: 'Page Contact', icon: MessageSquare },
 ];
 

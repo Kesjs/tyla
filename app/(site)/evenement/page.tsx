@@ -20,7 +20,7 @@ export default function EvenementPage() {
     <>
       <section className="relative flex h-[70vh] min-h-[440px] items-end overflow-hidden bg-noir">
         <div className="absolute inset-0">
-          <Image src="/images/backstage-01.jpg" alt="Backstage J'AFFIRME" fill className="object-cover opacity-60" />
+          <Image src="/images/committee-award.jpg" alt="Backstage J'AFFIRME" fill className="object-cover opacity-60" />
           <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/60 to-noir/40" />
         </div>
         <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-16 md:px-10">
