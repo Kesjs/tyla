@@ -12,6 +12,7 @@ import {
   formatFcfa,
 } from '@/lib/tickets';
 import { Reveal } from '@/components/Reveal';
+import { isValidEmail, validateAndSanitizeName, validateBeninPhone } from '@/lib/security';
 
 declare global {
   namespace JSX {
@@ -26,9 +27,11 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
   const [selected, setSelected] = useState<TicketCategory | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [name, setName] = useState('');
+  const [nameError, setNameError] = useState('');
   const [phone, setPhone] = useState('');
   const [phoneError, setPhoneError] = useState('');
   const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [step, setStep] = useState<'pick' | 'form' | 'paying' | 'error'>('pick');
   const [errorMsg, setErrorMsg] = useState('');
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -89,10 +92,35 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
     e.preventDefault();
     if (!selected) return;
     setErrorMsg('');
+    setNameError('');
+    setEmailError('');
+    setPhoneError('');
 
-    const phoneValidationError = validatePhone(phone);
-    if (phoneValidationError) {
-      setPhoneError(phoneValidationError);
+    // Validation client-side (double vérification avec serveur)
+    if (!name.trim()) {
+      setNameError('Le nom est requis.');
+      return;
+    }
+
+    const nameValidation = validateAndSanitizeName(name);
+    if (!nameValidation.valid) {
+      setNameError('Nom invalide. Utilisez uniquement des lettres, espaces, tirets et apostrophes.');
+      return;
+    }
+
+    if (!email.trim()) {
+      setEmailError('L\'email est requis.');
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setEmailError('Format d\'email invalide.');
+      return;
+    }
+
+    const phoneValidation = validateBeninPhone(phone.replace(/\D/g, ''));
+    if (!phoneValidation.valid) {
+      setPhoneError(phoneValidation.error);
       return;
     }
 
@@ -280,9 +308,12 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
               <input
                 required
                 value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="mt-2 w-full border-b border-taupe bg-transparent py-2.5 font-body text-ivoire outline-none focus:border-or"
+                onChange={(e) => { setName(e.target.value); if (nameError) setNameError(''); }}
+                className={`mt-2 w-full border-b bg-transparent py-2.5 font-body text-ivoire outline-none ${
+                  nameError ? 'border-porto focus:border-porto' : 'border-taupe focus:border-or'
+                }`}
               />
+              {nameError && <p className="mt-2 font-body text-xs text-porto-light">{nameError}</p>}
             </div>
             <div>
               <label className="font-body text-xs uppercase tracking-[0.2em] text-ivoire/50">Téléphone (Mobile Money)</label>
@@ -299,7 +330,10 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
                   placeholder="XX XX XX XX"
                   value={phone}
                   onChange={(e) => handlePhoneChange(e.target.value)}
-                  onBlur={() => setPhoneError(validatePhone(phone))}
+                  onBlur={() => {
+                    const validation = validateBeninPhone(phone.replace(/\D/g, ''));
+                    setPhoneError(validation.error);
+                  }}
                   aria-invalid={!!phoneError}
                   className={`flex-1 border-b bg-transparent py-2.5 pl-4 font-body text-ivoire outline-none ${
                     phoneError ? 'border-porto focus:border-porto' : 'border-taupe focus:border-or'
@@ -320,9 +354,17 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
                 required
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-2 w-full border-b border-taupe bg-transparent py-2.5 font-body text-ivoire outline-none focus:border-or"
+                onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError(''); }}
+                onBlur={() => {
+                  if (email && !isValidEmail(email)) {
+                    setEmailError('Format d\'email invalide.');
+                  }
+                }}
+                className={`mt-2 w-full border-b bg-transparent py-2.5 font-body text-ivoire outline-none ${
+                  emailError ? 'border-porto focus:border-porto' : 'border-taupe focus:border-or'
+                }`}
               />
+              {emailError && <p className="mt-2 font-body text-xs text-porto-light">{emailError}</p>}
             </div>
 
             {errorMsg && <p className="font-body text-sm text-porto-light">{errorMsg}</p>}

@@ -1,12 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyKkiapayTransaction, formatTicketCode } from '@/lib/kkiapay';
+import { SecurityLogger } from '@/lib/security';
+import { rateLimiter, RATE_LIMITS, getClientIP } from '@/lib/rate-limit';
+import { handleCORSOptions, applyCORS } from '@/lib/cors';
 
 export async function POST(req: NextRequest) {
+  // Gestion CORS preflight
+  const corsResponse = handleCORSOptions(req);
+  if (corsResponse) return corsResponse;
   try {
+    // Rate limiting
+    const ip = getClientIP(req);
+    const rateLimit = rateLimiter.check(ip, RATE_LIMITS.confirmPayment.limit, RATE_LIMITS.confirmPayment.windowMs);
+    
+    if (!rateLimit.allowed) {
+      SecurityLogger.logSuspiciousActivity('rate_limit_exceeded', ip, { endpoint: 'confirm-payment' });
+      return NextResponse.json(
+        { error: 'Trop de tentatives. Réessayez plus tard.' },
+        { status: 429 }
+      );
+    }
+
     const { orderId, transactionId } = await req.json();
     if (!orderId || !transactionId) {
       return NextResponse.json({ error: 'Paramètres manquants.' }, { status: 400 });
+    }
+
+    // Validation basique des IDs pour éviter l'injection
+    if (typeof orderId !== 'string' || orderId.length > 50) {
+      return NextResponse.json({ error: 'ID de commande invalide.' }, { status: 400 });
+    }
+    
+    if (typeof transactionId !== 'string' || transactionId.length > 100) {
+      return NextResponse.json({ error: 'ID de transaction invalide.' }, { status: 400 });
     }
 
     const supabase = createAdminClient();
@@ -106,8 +133,17 @@ export async function POST(req: NextRequest) {
       .update({ sold_count: cat.sold_count + order.quantity })
       .eq('id', order.category_id);
 
-    return NextResponse.json({ tickets });
+    SecurityLogger.logApiCall('confirm-payment', 'POST', ip, true);
+    SecurityLogger.log('payment_confirmed', { orderId, transactionId, amount: order.total_amount });
+
+    const response = NextResponse.json({ tickets });
+    return applyCORS(response);
   } catch (err) {
-    return NextResponse.json({ error: 'Erreur serveur.' }, { status: 500 });
+    SecurityLogger.log('confirm_payment_error', { 
+      error: err instanceof Error ? err.message : 'Unknown error',
+      orderId: orderId || 'unknown'
+    });
+    const response = NextResponse.json({ error: 'Erreur serveur.' }, { status: 500 });
+    return applyCORS(response);
   }
 }

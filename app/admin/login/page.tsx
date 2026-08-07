@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
@@ -10,6 +10,9 @@ import { GoldFrame } from '@/components/GoldFrame';
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isBlocked = searchParams.get('blocked') === 'true';
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -18,6 +21,12 @@ export default function AdminLoginPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    
+    if (isBlocked) {
+      setError('Trop de tentatives de connexion. Réessayez dans 15 minutes.');
+      return;
+    }
+    
     setLoading(true);
     setError('');
     const supabase = createClient();
@@ -131,8 +140,21 @@ export default function AdminLoginPage() {
                 </div>
               </div>
 
+              {/* Blocked message */}
+              {isBlocked && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="rounded border border-porto/50 bg-porto/20 px-4 py-3"
+                >
+                  <p className="font-body text-sm text-porto-light">
+                    Trop de tentatives de connexion. Votre IP a été temporairement bloquée pour des raisons de sécurité. Réessayez dans 15 minutes.
+                  </p>
+                </motion.div>
+              )}
+
               {/* Error message */}
-              {error && (
+              {error && !isBlocked && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
