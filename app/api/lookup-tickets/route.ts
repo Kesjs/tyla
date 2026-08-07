@@ -4,19 +4,19 @@ import { isValidEmail, SecurityLogger } from '@/lib/security';
 import { rateLimiter, RATE_LIMITS, getClientIP } from '@/lib/rate-limit';
 
 export async function POST(req: NextRequest) {
-  try {
-    // Rate limiting plus strict pour lookup (protection contre énumération)
-    const ip = getClientIP(req);
-    const rateLimit = rateLimiter.check(ip, RATE_LIMITS.lookupTickets.limit, RATE_LIMITS.lookupTickets.windowMs);
-    
-    if (!rateLimit.allowed) {
-      SecurityLogger.logSuspiciousActivity('rate_limit_exceeded', ip, { endpoint: 'lookup-tickets' });
-      return NextResponse.json(
-        { error: 'Trop de tentatives de recherche. Réessayez plus tard.' },
-        { status: 429 }
-      );
-    }
+  // Rate limiting plus strict pour lookup (protection contre énumération)
+  const ip = getClientIP(req);
+  const rateLimit = rateLimiter.check(ip, RATE_LIMITS.lookupTickets.limit, RATE_LIMITS.lookupTickets.windowMs);
+  
+  if (!rateLimit.allowed) {
+    SecurityLogger.logSuspiciousActivity('rate_limit_exceeded', ip, { endpoint: 'lookup-tickets' });
+    return NextResponse.json(
+      { error: 'Trop de tentatives de recherche. Réessayez plus tard.' },
+      { status: 429 }
+    );
+  }
 
+  try {
     const { email, phone } = await req.json();
     if (!email || !phone) {
       return NextResponse.json({ error: 'Email et téléphone requis.' }, { status: 400 });
