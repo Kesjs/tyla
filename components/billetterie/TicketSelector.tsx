@@ -244,14 +244,20 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
             </div>
             <div>
               <label className="font-body text-xs uppercase tracking-[0.2em] text-ivoire/50">Téléphone (Mobile Money)</label>
-              <input
-                required
-                type="tel"
-                placeholder="+229 XX XX XX XX"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="mt-2 w-full border-b border-taupe bg-transparent py-2.5 font-body text-ivoire outline-none focus:border-or"
-              />
+              <div className="mt-2 flex">
+                <div className="flex items-center gap-2 border-b border-taupe bg-noir-soft px-4 py-2.5">
+                  <span className="text-xl">🇧🇯</span>
+                  <span className="font-body text-sm text-ivoire/70">+229</span>
+                </div>
+                <input
+                  required
+                  type="tel"
+                  placeholder="XX XX XX XX"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="flex-1 border-b border-taupe bg-transparent py-2.5 pl-4 font-body text-ivoire outline-none focus:border-or"
+                />
+              </div>
             </div>
             <div>
               <label className="font-body text-xs uppercase tracking-[0.2em] text-ivoire/50">Email</label>
