@@ -9,6 +9,10 @@ export async function POST(req: NextRequest) {
   // Gestion CORS preflight
   const corsResponse = handleCORSOptions(req);
   if (corsResponse) return corsResponse;
+
+  let orderId: string | null = null;
+  let transactionId: string | null = null;
+
   try {
     // Rate limiting
     const ip = getClientIP(req);
@@ -22,7 +26,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { orderId, transactionId } = await req.json();
+    const body = await req.json();
+    orderId = body.orderId;
+    transactionId = body.transactionId;
+
     if (!orderId || !transactionId) {
       return NextResponse.json({ error: 'Paramètres manquants.' }, { status: 400 });
     }
