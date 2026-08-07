@@ -270,6 +270,11 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
           </div>
 
           <form onSubmit={submitOrder} className="mt-8 space-y-5">
+            <p className="border-l-2 border-or/40 pl-3 font-body text-xs leading-relaxed text-ivoire/50">
+              Notez bien l&apos;email et le téléphone ci-dessous : ce sont les
+              identifiants qui vous permettront de retrouver vos billets si
+              vous fermez la page après paiement.
+            </p>
             <div>
               <label className="font-body text-xs uppercase tracking-[0.2em] text-ivoire/50">Nom complet</label>
               <input

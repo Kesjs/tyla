@@ -28,6 +28,12 @@ export default async function BilletteriePage() {
             Mobile Money ou carte. Votre billet (avec QR code) vous est
             présenté immédiatement après paiement.
           </p>
+          <a
+            href="/billetterie/retrouver"
+            className="mt-4 inline-block font-body text-xs uppercase tracking-[0.2em] text-or/80 underline-offset-4 hover:text-or hover:underline"
+          >
+            Déjà payé ? Retrouver mes billets
+          </a>
         </Reveal>
       </div>
 

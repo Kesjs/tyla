@@ -99,5 +99,7 @@ jamais recevoir le même numéro.
 
 ## Notes importantes
 
-- **Emails de confirmation** : pas encore branchés (aucun service d'email configuré). L'acheteur voit ses billets/QR codes immédiatement après paiement sur la page de confirmation — à compléter plus tard avec un service comme Resend si l'envoi par email est souhaité.
+- **Billet PDF** : chaque billet peut être téléchargé en PDF (bouton sur la page de confirmation), généré côté navigateur avec jsPDF — aucune dépendance externe, aucun compte à créer.
+- **Retrouver ses billets** (`/billetterie/retrouver`) : si l'acheteur ferme la page de confirmation avant de tout télécharger, rien n'est perdu — les billets sont en base dès le paiement confirmé. Il peut les retrouver à tout moment avec son email + le téléphone utilisés lors de l'achat.
+- **Emails de confirmation** : pas encore branchés (aucun service d'email configuré). L'acheteur voit et télécharge ses billets/QR codes immédiatement après paiement, et peut les retrouver plus tard via `/billetterie/retrouver`. Si l'envoi automatique par email est souhaité en plus, ça demandera un service comme Resend (clé API à ajouter).
 - **Mode sandbox Kkiapay** : à désactiver avant le lancement réel (voir ci-dessus).

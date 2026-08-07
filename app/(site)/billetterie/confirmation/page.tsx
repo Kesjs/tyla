@@ -54,7 +54,11 @@ export default async function ConfirmationPage({
           </h1>
           <p className="mt-4 font-body text-sm text-ivoire/60">
             Présentez le QR code de chaque billet à l&apos;entrée le 24 octobre 2026.
-            Faites une capture d&apos;écran ou téléchargez-les.
+            Téléchargez chaque billet en PDF pour le garder sur votre téléphone, l&apos;imprimer, ou simplement gardez cette page ouverte.
+          </p>
+          <p className="mt-2 font-body text-xs text-ivoire/40">
+            Pas d&apos;inquiétude si vous fermez cette page : vos billets restent
+            accessibles via <a href="/billetterie/retrouver" className="text-or underline-offset-4 hover:underline">Retrouver mes billets</a>.
           </p>
         </Reveal>
       </div>
