@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -8,7 +8,7 @@ import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { GoldFrame } from '@/components/GoldFrame';
 
-export default function AdminLoginPage() {
+function AdminLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isBlocked = searchParams.get('blocked') === 'true';
@@ -204,5 +204,17 @@ export default function AdminLoginPage() {
         </GoldFrame>
       </motion.div>
     </section>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={
+      <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-noir">
+        <div className="text-ivoire/50">Chargement...</div>
+      </section>
+    }>
+      <AdminLoginForm />
+    </Suspense>
   );
 }
