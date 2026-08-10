@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { verifyKkiapayTransaction, formatTicketCode } from '@/lib/kkiapay';
+import { verifyGeniusPayTransaction, formatTicketCode } from '@/lib/geniuspay';
 import { SecurityLogger } from '@/lib/security';
 import { rateLimiter, RATE_LIMITS, getClientIP } from '@/lib/rate-limit';
 import { handleCORSOptions, applyCORS } from '@/lib/cors';
@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   if (corsResponse) return corsResponse;
 
   let orderId: string | null = null;
-  let transactionId: string | null = null;
+  let reference: string | null = null;
 
   try {
     // Rate limiting
@@ -28,10 +28,10 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     orderId = body.orderId;
-    transactionId = body.transactionId;
+    reference = body.reference;
 
-    if (!orderId || !transactionId) {
-      return NextResponse.json({ error: 'Paramètres manquants.' }, { status: 400 });
+    if (!orderId || !reference) {
+      return NextResponse.json({ error: 'Paramètres manquants (orderId, reference).' }, { status: 400 });
     }
 
     // Validation basique des IDs pour éviter l'injection
@@ -39,8 +39,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'ID de commande invalide.' }, { status: 400 });
     }
     
-    if (typeof transactionId !== 'string' || transactionId.length > 100) {
-      return NextResponse.json({ error: 'ID de transaction invalide.' }, { status: 400 });
+    if (typeof reference !== 'string' || reference.length > 100) {
+      return NextResponse.json({ error: 'Référence GeniusPay invalide.' }, { status: 400 });
     }
 
     const supabase = createAdminClient();
@@ -64,20 +64,36 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ tickets: existingTickets ?? [] });
     }
 
-    // Vérification réelle auprès de Kkiapay
+    // Vérification auprès de GeniusPay via la référence
     let verification;
     try {
-      verification = await verifyKkiapayTransaction(transactionId);
+      verification = await verifyGeniusPayTransaction(reference);
     } catch {
       return NextResponse.json({ error: 'Vérification du paiement impossible pour le moment.' }, { status: 502 });
     }
 
-    if (verification.status !== 'SUCCESS') {
+    // Vérification du statut du paiement
+    // Status peut être: 'pending', 'processing', 'completed', 'failed', 'cancelled', 'refunded'
+    if (verification.data?.status !== 'completed') {
       await supabase
         .from('tyla_orders')
-        .update({ status: 'failed', payment_transaction_id: transactionId, payment_raw_response: verification })
+        .update({ 
+          status: 'failed', 
+          payment_reference: reference, 
+          payment_raw_response: verification 
+        })
         .eq('id', orderId);
       return NextResponse.json({ error: 'Le paiement n\'a pas été confirmé.' }, { status: 402 });
+    }
+
+    // Vérification du montant pour éviter les fraudes
+    if (verification.data?.amount && verification.data.amount !== order.total_amount) {
+      SecurityLogger.logSuspiciousActivity('amount_mismatch', ip, { 
+        orderId, 
+        expectedAmount: order.total_amount,
+        receivedAmount: verification.data.amount 
+      });
+      return NextResponse.json({ error: 'Montant de paiement incohérent.' }, { status: 402 });
     }
 
     // Paiement confirmé : on marque la commande payée
@@ -85,7 +101,7 @@ export async function POST(req: NextRequest) {
       .from('tyla_orders')
       .update({
         status: 'paid',
-        payment_transaction_id: transactionId,
+        payment_reference: reference,
         payment_raw_response: verification,
       })
       .eq('id', orderId);
@@ -141,7 +157,7 @@ export async function POST(req: NextRequest) {
       .eq('id', order.category_id);
 
     SecurityLogger.logApiCall('confirm-payment', 'POST', ip, true);
-    SecurityLogger.log('payment_confirmed', { orderId, transactionId, amount: order.total_amount });
+    SecurityLogger.log('payment_confirmed', { orderId, reference, amount: order.total_amount });
 
     const response = NextResponse.json({ tickets });
     return applyCORS(response);

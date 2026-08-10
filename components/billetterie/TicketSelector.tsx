@@ -1,7 +1,5 @@
 'use client';
-
 import { useState, useEffect } from 'react';
-import Script from 'next/script';
 import { useRouter } from 'next/navigation';
 import { Minus, Plus } from 'lucide-react';
 import {
@@ -13,14 +11,6 @@ import {
 } from '@/lib/tickets';
 import { Reveal } from '@/components/Reveal';
 import { isValidEmail, validateAndSanitizeName, validateBeninPhone } from '@/lib/security';
-
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'kkiapay-widget': any;
-    }
-  }
-}
 
 export function TicketSelector({ categories }: { categories: TicketCategory[] }) {
   const router = useRouter();
@@ -91,113 +81,139 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
   async function submitOrder(e: React.FormEvent) {
     e.preventDefault();
     if (!selected) return;
-    setErrorMsg('');
-    setNameError('');
-    setEmailError('');
-    setPhoneError('');
+    
+    try {
+      // Afficher immédiatement le feedback visuel
+      setStep('paying');
+      
+      setErrorMsg('');
+      setNameError('');
+      setEmailError('');
+      setPhoneError('');
 
-    // Validation client-side (double vérification avec serveur)
-    if (!name.trim()) {
-      setNameError('Le nom est requis.');
-      return;
-    }
-
-    const nameValidation = validateAndSanitizeName(name);
-    if (!nameValidation.valid) {
-      setNameError('Nom invalide. Utilisez uniquement des lettres, espaces, tirets et apostrophes.');
-      return;
-    }
-
-    if (!email.trim()) {
-      setEmailError('L\'email est requis.');
-      return;
-    }
-
-    if (!isValidEmail(email)) {
-      setEmailError('Format d\'email invalide.');
-      return;
-    }
-
-    const phoneValidation = validateBeninPhone(phone.replace(/\D/g, ''));
-    if (!phoneValidation.valid) {
-      setPhoneError(phoneValidation.error);
-      return;
-    }
-
-    const digitsOnly = phone.replace(/\D/g, '');
-    const fullPhone = `+229 01 ${digitsOnly.slice(0, 2)} ${digitsOnly.slice(2, 4)} ${digitsOnly.slice(4, 6)} ${digitsOnly.slice(6, 8)}`;
-
-    const res = await fetch('/api/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        categoryId: selected.id,
-        quantity,
-        buyerName: name,
-        buyerPhone: fullPhone,
-        buyerEmail: email,
-      }),
-    });
-    const data = await res.json();
-
-    if (!res.ok) {
-      setErrorMsg(data.error ?? 'Une erreur est survenue.');
-      return;
-    }
-
-    setOrderId(data.orderId);
-    setAmount(data.amount);
-    setStep('paying');
-
-    // Ouvre le widget Kkiapay une fois le script chargé
-    setTimeout(() => {
-      // @ts-ignore — API globale injectée par le script Kkiapay
-      if (typeof window.openKkiapayWidget === 'function') {
-        // @ts-ignore
-        window.openKkiapayWidget({
-          amount: data.amount,
-          key: process.env.NEXT_PUBLIC_KKIAPAY_PUBLIC_KEY,
-          sandbox: true, // ⚠️ passer à false une fois le compte Kkiapay validé en production
-          data: JSON.stringify({ orderId: data.orderId }),
-          phone: `22901${phone.replace(/\D/g, '')}`,
-          email,
-          name,
-        });
+      // Validation client-side (double vérification avec serveur)
+      if (!name.trim()) {
+        setNameError('Le nom est requis.');
+        setStep('form');
+        return;
       }
-    }, 200);
+
+      const nameValidation = validateAndSanitizeName(name);
+      if (!nameValidation.valid) {
+        setNameError('Nom invalide. Utilisez uniquement des lettres, espaces, tirets et apostrophes.');
+        setStep('form');
+        return;
+      }
+
+      if (!email.trim()) {
+        setEmailError('L\'email est requis.');
+        setStep('form');
+        return;
+      }
+
+      if (!isValidEmail(email)) {
+        setEmailError('Format d\'email invalide.');
+        setStep('form');
+        return;
+      }
+
+      const phoneValidation = validateBeninPhone(phone.replace(/\D/g, ''));
+      if (!phoneValidation.valid) {
+        setPhoneError(phoneValidation.error);
+        setStep('form');
+        return;
+      }
+
+      const digitsOnly = phone.replace(/\D/g, '');
+      const fullPhone = `+229 01 ${digitsOnly.slice(0, 2)} ${digitsOnly.slice(2, 4)} ${digitsOnly.slice(4, 6)} ${digitsOnly.slice(6, 8)}`;
+
+      console.log('[submitOrder] Creating order:', { categoryId: selected.id, quantity, name, email });
+
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          categoryId: selected.id,
+          quantity,
+          buyerName: name,
+          buyerPhone: fullPhone,
+          buyerEmail: email,
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        const errorMsg = data.error ?? 'Erreur lors de la création de la commande.';
+        console.error('[submitOrder] Checkout error:', errorMsg);
+        setErrorMsg(errorMsg);
+        setStep('form');
+        return;
+      }
+
+      console.log('[submitOrder] Order created:', { orderId: data.orderId, amount: data.amount });
+      setOrderId(data.orderId);
+      setAmount(data.amount);
+
+      // Redirection vers GeniusPay (step 'paying' déjà set)
+      await initiateGeniusPayPayment(data.orderId, data.amount, email, name, fullPhone);
+    } catch (error) {
+      console.error('[submitOrder] Exception:', error);
+      setErrorMsg('Une erreur inattendue s\'est produite. Vérifiez la console.');
+      setStep('form');
+    }
   }
 
-  async function handleKkiapaySuccess(transactionId: string) {
-    if (!orderId) return;
-    const res = await fetch('/api/confirm-payment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderId, transactionId }),
-    });
-    if (res.ok) {
-      router.push(`/billetterie/confirmation?order=${orderId}`);
-    } else {
-      setStep('error');
-      setErrorMsg("Le paiement a été reçu mais la confirmation a échoué. Contactez benin@tylafrica.com avec votre référence.");
+  async function initiateGeniusPayPayment(
+    orderId: string,
+    amount: number,
+    email: string,
+    name: string,
+    phone: string
+  ) {
+    try {
+      // Récupérer le lien de paiement GeniusPay
+      const response = await fetch('/api/geniuspay/initiate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId,
+          amount,
+          description: `Achat de billets TYLA - ${selected?.name}`,
+          customerName: name,
+          customerEmail: email,
+          customerPhone: phone,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        setErrorMsg(error.error || 'Erreur lors de l\'initialisation du paiement GeniusPay');
+        setStep('form');
+        return;
+      }
+
+      const data = await response.json();
+      console.log('[TicketSelector] Payment response - Full:', JSON.stringify(data, null, 2));
+      console.log('[TicketSelector] Available keys:', Object.keys(data));
+      
+      // Redirection vers le checkout GeniusPay hébergé
+      if (data.checkoutUrl) {
+        console.log('[TicketSelector] Redirecting to:', data.checkoutUrl);
+        window.location.href = data.checkoutUrl;
+      } else {
+        console.error('[TicketSelector] No checkout URL found. Available:', data);
+        setErrorMsg('Impossible de récupérer le lien de paiement. Réponse: ' + JSON.stringify(data));
+        setStep('form');
+      }
+    } catch (error) {
+      console.error('Erreur GeniusPay:', error);
+      setErrorMsg('Erreur lors de la connexion à GeniusPay');
+      setStep('form');
     }
   }
 
   return (
     <>
-      <Script src="https://cdn.kkiapay.me/k.js" strategy="afterInteractive" />
-      <Script id="kkiapay-listener" strategy="afterInteractive">
-        {`
-          window.addEventListener('kkiapay-widget:success', (e) => {
-            window.dispatchEvent(new CustomEvent('tyla-kkiapay-success', { detail: e.detail }));
-          });
-          window.addEventListener('kkiapay-widget:close', () => {
-            window.dispatchEvent(new CustomEvent('tyla-kkiapay-close'));
-          });
-        `}
-      </Script>
-      <KkiapaySuccessListener onSuccess={handleKkiapaySuccess} />
-      <KkiapayCloseListener onClose={cancelPayment} active={step === 'paying'} />
-
       {step === 'pick' && (
         <div className="grid gap-6 sm:grid-cols-2">
           {categories.map((cat, i) => {
@@ -371,12 +387,13 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
 
             <button
               type="submit"
-              className="mt-2 w-full border border-or bg-or py-3.5 font-body text-xs uppercase tracking-[0.25em] text-noir transition-opacity hover:opacity-90"
+              disabled={false}
+              className="mt-2 w-full border border-or bg-or py-3.5 font-body text-xs uppercase tracking-[0.25em] text-noir transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Payer {formatFcfa(effectivePrice(selected) * quantity)}
+              {step !== 'form' ? 'Traitement...' : `Payer ${formatFcfa(effectivePrice(selected) * quantity)}`}
             </button>
             <p className="text-center font-body text-[11px] text-ivoire/40">
-              Paiement sécurisé via Kkiapay — Mobile Money &amp; carte bancaire
+              Paiement sécurisé via GeniusPay — Mobile Money, Carte bancaire &amp; Portefeuille numérique
             </p>
           </form>
         </Reveal>
@@ -386,7 +403,7 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
         <div className="mx-auto max-w-lg border border-or/40 p-10 text-center">
           <p className="font-display text-lg text-ivoire">Fenêtre de paiement ouverte…</p>
           <p className="mt-3 font-body text-sm text-ivoire/50">
-            Complétez le paiement de {formatFcfa(amount)} dans la fenêtre Kkiapay.
+            Complétez le paiement de {formatFcfa(amount)} dans la fenêtre GeniusPay.
             Si elle ne s&apos;est pas ouverte, vérifiez que les pop-ups sont autorisés.
           </p>
           <button
@@ -406,34 +423,4 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
       )}
     </>
   );
-}
-
-/** Écoute l'événement de succès Kkiapay redispatché globalement. */
-function KkiapaySuccessListener({ onSuccess }: { onSuccess: (transactionId: string) => void }) {
-  useEffect(() => {
-    function handler(e: any) {
-      const transactionId = e.detail?.transactionId ?? e.detail?.transaction_id;
-      if (transactionId) onSuccess(transactionId);
-    }
-    window.addEventListener('tyla-kkiapay-success', handler);
-    return () => window.removeEventListener('tyla-kkiapay-success', handler);
-  }, [onSuccess]);
-  return null;
-}
-
-/**
- * Écoute la fermeture du widget Kkiapay sans paiement abouti (croix cliquée)
- * pour ramener automatiquement l'utilisateur à l'étape précédente au lieu
- * de le laisser bloqué sur "Fenêtre de paiement ouverte...".
- */
-function KkiapayCloseListener({ onClose, active }: { onClose: () => void; active: boolean }) {
-  useEffect(() => {
-    if (!active) return;
-    function handler() {
-      onClose();
-    }
-    window.addEventListener('tyla-kkiapay-close', handler);
-    return () => window.removeEventListener('tyla-kkiapay-close', handler);
-  }, [onClose, active]);
-  return null;
 }
