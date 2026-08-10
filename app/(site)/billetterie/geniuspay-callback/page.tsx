@@ -24,9 +24,12 @@ function GeniusPayCallbackContent() {
           return;
         }
 
-        if (!reference || paymentStatus !== 'success') {
-          setStatus('error');
-          setErrorMsg('Le paiement n\'a pas été confirmé. Contactez benin@tylafrica.com avec votre référence.');
+        // Si le paiement a été annulé, rediriger vers la billetterie
+        if (paymentStatus === 'error' || !reference || paymentStatus !== 'success') {
+          // Rediriger immédiatement vers la billetterie avec un message d'erreur
+          setTimeout(() => {
+            router.push('/billetterie?payment=cancelled');
+          }, 500);
           return;
         }
 

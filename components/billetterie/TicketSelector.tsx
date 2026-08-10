@@ -12,7 +12,7 @@ import {
 import { Reveal } from '@/components/Reveal';
 import { isValidEmail, validateAndSanitizeName, validateBeninPhone } from '@/lib/security';
 
-export function TicketSelector({ categories }: { categories: TicketCategory[] }) {
+export function TicketSelector({ categories, paymentCancelled }: { categories: TicketCategory[], paymentCancelled?: boolean }) {
   const router = useRouter();
   const [selected, setSelected] = useState<TicketCategory | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -26,6 +26,13 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
   const [errorMsg, setErrorMsg] = useState('');
   const [orderId, setOrderId] = useState<string | null>(null);
   const [amount, setAmount] = useState(0);
+
+  // Afficher un message si le paiement a été annulé
+  useEffect(() => {
+    if (paymentCancelled) {
+      setErrorMsg('Votre paiement a été annulé. N\'hésitez pas à réessayer.');
+    }
+  }, [paymentCancelled]);
 
   // Empêche un rechargement/fermeture accidentel pendant qu'un paiement est en cours
   useEffect(() => {
@@ -199,7 +206,11 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
       // Redirection vers le checkout GeniusPay hébergé
       if (data.checkoutUrl) {
         console.log('[TicketSelector] Redirecting to:', data.checkoutUrl);
-        window.location.href = data.checkoutUrl;
+        // Ajouter les paramètres de callback avec l'orderId pour gérer l'annulation
+        const callbackUrl = data.checkoutUrl.includes('?')
+          ? `${data.checkoutUrl}&order=${orderId}`
+          : `${data.checkoutUrl}?order=${orderId}`;
+        window.location.href = callbackUrl;
       } else {
         console.error('[TicketSelector] No checkout URL found. Available:', data);
         setErrorMsg('Impossible de récupérer le lien de paiement. Réponse: ' + JSON.stringify(data));
@@ -214,6 +225,15 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
 
   return (
     <>
+      {step === 'pick' && paymentCancelled && (
+        <Reveal>
+          <div className="mb-8 border-l-2 border-or bg-or/5 pl-4 py-3">
+            <p className="font-body text-sm text-or/80">
+              Votre paiement a été annulé. N'hésitez pas à réessayer. Si vous avez besoin d'aide, contactez-nous à benin@tylafrica.com
+            </p>
+          </div>
+        </Reveal>
+      )}
       {step === 'pick' && (
         <div className="grid gap-6 sm:grid-cols-2">
           {categories.map((cat, i) => {
@@ -383,7 +403,20 @@ export function TicketSelector({ categories }: { categories: TicketCategory[] })
               {emailError && <p className="mt-2 font-body text-xs text-porto-light">{emailError}</p>}
             </div>
 
-            {errorMsg && <p className="font-body text-sm text-porto-light">{errorMsg}</p>}
+            {errorMsg && (
+              <div className="border-l-2 border-porto bg-porto/5 pl-4 py-3">
+                <div className="flex items-start justify-between gap-4">
+                  <p className="font-body text-sm text-porto-light">{errorMsg}</p>
+                  <button
+                    onClick={() => setErrorMsg('')}
+                    className="flex-shrink-0 text-porto/50 hover:text-porto"
+                    aria-label="Fermer"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            )}
 
             <button
               type="submit"

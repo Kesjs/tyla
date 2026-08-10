@@ -5,7 +5,11 @@ import type { TicketCategory } from '@/lib/tickets';
 
 export const revalidate = 0;
 
-export default async function BilletteriePage() {
+export default async function BilletteriePage({
+  searchParams,
+}: {
+  searchParams: Record<string, string | string[] | undefined>;
+}) {
   const supabase = createClient();
   const { data } = await supabase
     .from('tyla_ticket_categories')
@@ -14,6 +18,7 @@ export default async function BilletteriePage() {
     .order('display_order', { ascending: true });
 
   const categories = (data ?? []) as TicketCategory[];
+  const paymentCancelled = searchParams.payment === 'cancelled';
 
   return (
     <section className="min-h-screen bg-noir pb-32 pt-40 md:pt-48">
@@ -38,7 +43,7 @@ export default async function BilletteriePage() {
       </div>
 
       <div className="mx-auto mt-16 max-w-5xl px-6 md:px-10">
-        <TicketSelector categories={categories} />
+        <TicketSelector categories={categories} paymentCancelled={paymentCancelled} />
       </div>
     </section>
   );
