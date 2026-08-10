@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   description:
     "J'AFFIRME n'est pas un défilé de mode comme les autres. Le 24 octobre 2026, à Cotonou, T.Y.L.A — The Young Leadership Africa — affirme que l'excellence créative africaine n'a besoin de la permission de personne pour exister au sommet.",
   metadataBase: new URL('https://jaffirme.tylafrica.com'),
+  icons: {
+    icon: '/icon.jpg',
+  },
   openGraph: {
     title: "J'AFFIRME — T.Y.L.A Fashion Week 2026",
     description: 'Cotonou, Bénin · 24 octobre 2026',
