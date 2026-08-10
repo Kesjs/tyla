@@ -1,6 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin';
-import { TicketCard } from '@/components/billetterie/TicketCard';
-import { Reveal } from '@/components/Reveal';
+import { ConfirmationContent } from '@/components/billetterie/TicketCard';
 
 export const revalidate = 0;
 
@@ -44,36 +43,13 @@ export default async function ConfirmationPage({
     );
   }
 
-  return (
-    <section className="min-h-screen bg-noir px-6 pb-32 pt-40 md:px-10 md:pt-48">
-      <div className="mx-auto max-w-2xl text-center">
-        <Reveal>
-          <p className="font-body text-xs uppercase tracking-[0.35em] text-or">Paiement confirmé</p>
-          <h1 className="mt-5 font-display text-3xl font-semibold text-ivoire sm:text-4xl">
-            Vos billets sont prêts.
-          </h1>
-          <p className="mt-4 font-body text-sm text-ivoire/60">
-            Présentez le QR code de chaque billet à l&apos;entrée le 24 octobre 2026.
-            Téléchargez chaque billet en PDF pour le garder sur votre téléphone, l&apos;imprimer, ou simplement gardez cette page ouverte.
-          </p>
-          <p className="mt-2 font-body text-xs text-ivoire/40">
-            Pas d&apos;inquiétude si vous fermez cette page : vos billets restent
-            accessibles via <a href="/billetterie/retrouver" className="text-or underline-offset-4 hover:underline">Retrouver mes billets</a>.
-          </p>
-        </Reveal>
-      </div>
+  // Préparer les données des billets
+  const ticketData = tickets.map((t) => ({
+    id: t.id,
+    ticketCode: t.ticket_code,
+    categoryName: order.tyla_ticket_categories?.name ?? 'BILLET',
+    buyerName: t.buyer_name,
+  }));
 
-      <div className="mx-auto mt-14 flex max-w-md flex-col gap-6">
-        {tickets.map((t, i) => (
-          <Reveal key={t.id} delay={i * 0.1}>
-            <TicketCard
-              ticketCode={t.ticket_code}
-              categoryName={order.tyla_ticket_categories?.name ?? ''}
-              buyerName={t.buyer_name}
-            />
-          </Reveal>
-        ))}
-      </div>
-    </section>
-  );
+  return <ConfirmationContent tickets={ticketData} />;
 }
