@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 
 /**
  * Page de test SANDBOX UNIQUEMENT
- * Permet de tester le flux de paiement sans GeniusPay
+ * Simule un webhook GeniusPay avec signature HMAC valide
+ * Permet de tester le flux complet: paiement → webhook → billets
  * 
  * À SUPPRIMER avant la production
  */
@@ -17,7 +18,7 @@ export default function TestSandboxPage() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  async function simulatePayment() {
+  async function simulateWebhook() {
     if (!orderId.trim()) {
       setError('Veuillez entrer un ID de commande');
       return;
@@ -28,8 +29,11 @@ export default function TestSandboxPage() {
     setMessage('');
 
     try {
-      const response = await fetch(`/api/test/confirm-payment-sandbox?orderId=${orderId}`, {
+      // Appel l'API pour simuler le webhook
+      const response = await fetch('/api/test/simulate-geniuspay-webhook', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId }),
       });
 
       const data = await response.json();
@@ -39,7 +43,7 @@ export default function TestSandboxPage() {
         return;
       }
 
-      setMessage(`✓ Paiement simulé avec succès ! ${data.ticketsCount} billet(s) créé(s)`);
+      setMessage(`✓ Webhook simulé avec succès ! ${data.ticketsCount} billet(s) créé(s)`);
       
       // Rediriger vers la page de confirmation après 2 secondes
       setTimeout(() => {
@@ -62,7 +66,7 @@ export default function TestSandboxPage() {
             Simuler un paiement
           </h1>
           <p className="mt-4 font-body text-sm text-ivoire/60">
-            Cette page permet de tester le flux de paiement en sandbox sans appeler GeniusPay.
+            Cette page simule un webhook GeniusPay avec signature HMAC valide. Parfait pour tester le flux complet sans passer par GeniusPay.
           </p>
 
           <div className="mt-8 space-y-4 text-left">
@@ -99,12 +103,25 @@ export default function TestSandboxPage() {
             )}
 
             <button
-              onClick={simulatePayment}
+              onClick={simulateWebhook}
               disabled={loading}
               className="mt-6 w-full border border-or bg-or py-3.5 font-body text-xs uppercase tracking-[0.25em] text-noir transition-opacity hover:opacity-90 disabled:opacity-50"
             >
-              {loading ? 'Simulation...' : 'Simuler le paiement'}
+              {loading ? 'Simulation en cours...' : 'Simuler le webhook GeniusPay'}
             </button>
+          </div>
+
+          <div className="mt-6 space-y-2 border-t border-taupe/20 pt-6 text-left">
+            <p className="font-body text-xs text-ivoire/40">
+              <span className="font-semibold text-ivoire/60">Comment ça fonctionne :</span>
+            </p>
+            <ol className="list-inside space-y-1 font-body text-xs text-ivoire/40">
+              <li>1. L'API génère un webhook GeniusPay simulé</li>
+              <li>2. Elle calcule une signature HMAC valide</li>
+              <li>3. Elle envoie le webhook à /api/webhook/geniuspay</li>
+              <li>4. Le webhook marque la commande comme payée</li>
+              <li>5. Tu vois tes billets et peux les télécharger</li>
+            </ol>
           </div>
 
           <p className="mt-6 border-t border-taupe/20 pt-6 font-body text-xs text-ivoire/40">
