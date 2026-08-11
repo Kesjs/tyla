@@ -55,6 +55,7 @@ export async function POST(req: NextRequest) {
     // Traite le webhook
     const webhookResult = await handleGeniusPayWebhook(payload);
     if (!webhookResult.success) {
+      console.log('[Webhook] Handle webhook failed:', webhookResult);
       return NextResponse.json({ error: 'Erreur lors du traitement du webhook' }, { status: 400 });
     }
 
