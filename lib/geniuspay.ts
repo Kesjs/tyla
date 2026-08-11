@@ -212,25 +212,48 @@ export async function verifyGeniusPayTransaction(
 
 /**
  * Valide que le webhook GeniusPay est authentique
- * Utilise la signature HMAC-SHA256 dans X-GeniusPay-Signature
+ * Utilise la signature HMAC-SHA256 avec timestamp (protection replay attack)
+ * Format: HMAC-SHA256(timestamp + "." + json_payload, webhook_secret)
  */
 export function validateGeniusPayWebhook(
   payload: string,
-  signature: string
+  signature: string,
+  timestamp: number
 ): boolean {
-  const apiSecret = process.env.GENIUSPAY_API_SECRET;
-  if (!apiSecret) {
-    throw new Error('GENIUSPAY_API_SECRET is not configured');
+  const webhookSecret = process.env.GENIUSPAY_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    console.warn('[GeniusPay Webhook] GENIUSPAY_WEBHOOK_SECRET not configured, falling back to API_SECRET');
+    // Fallback to API_SECRET if webhook secret not configured
+    const apiSecret = process.env.GENIUSPAY_API_SECRET;
+    if (!apiSecret) {
+      throw new Error('GeniusPay webhook credentials not configured');
+    }
+  }
+
+  // Vérifier que le timestamp n'est pas trop ancien (protection replay attack - 5 min)
+  const now = Math.floor(Date.now() / 1000);
+  if (Math.abs(now - timestamp) > 300) {
+    console.warn('[GeniusPay Webhook] Timestamp too old:', { timestamp, now, diff: Math.abs(now - timestamp) });
+    return false;
   }
 
   const crypto = require('crypto');
+  const secret = webhookSecret || process.env.GENIUSPAY_API_SECRET;
+  
+  // Construire les données à vérifier: timestamp + "." + payload
+  const data = `${timestamp}.${payload}`;
+  
   const expectedSignature = crypto
-    .createHmac('sha256', apiSecret)
-    .update(payload)
+    .createHmac('sha256', secret)
+    .update(data)
     .digest('hex');
 
   const isValid = expectedSignature === signature;
-  console.log('[GeniusPay Webhook] Signature validation:', isValid ? '✓ Valid' : '✗ Invalid');
+  console.log('[GeniusPay Webhook] Signature validation:', isValid ? '✓ Valid' : '✗ Invalid', {
+    timestamp,
+    signatureLength: signature.length,
+    expectedLength: expectedSignature.length,
+  });
   
   return isValid;
 }

@@ -18,18 +18,32 @@ export async function POST(req: NextRequest) {
   const ip = getClientIP(req);
 
   try {
-    // Récupère la signature du webhook depuis les headers
-    const signature = req.headers.get('x-geniuspay-signature');
+    // Récupère les headers du webhook
+    const signature = req.headers.get('x-webhook-signature') || req.headers.get('x-geniuspay-signature');
+    const timestamp = req.headers.get('x-webhook-timestamp');
+    const event = req.headers.get('x-webhook-event');
+    
     if (!signature) {
       SecurityLogger.logSuspiciousActivity('webhook_missing_signature', ip, { endpoint: 'geniuspay' });
       return NextResponse.json({ error: 'Signature manquante' }, { status: 401 });
     }
 
+    if (!timestamp) {
+      SecurityLogger.logSuspiciousActivity('webhook_missing_timestamp', ip, { endpoint: 'geniuspay' });
+      return NextResponse.json({ error: 'Timestamp manquant' }, { status: 401 });
+    }
+
     // Récupère le body brut pour la validation de signature
     const rawBody = await req.text();
     
-    // Valide la signature du webhook
-    const isValid = validateGeniusPayWebhook(rawBody, signature);
+    // Valide la signature du webhook avec timestamp
+    const timestampNum = parseInt(timestamp, 10);
+    if (isNaN(timestampNum)) {
+      SecurityLogger.logSuspiciousActivity('webhook_invalid_timestamp', ip, { endpoint: 'geniuspay' });
+      return NextResponse.json({ error: 'Timestamp invalide' }, { status: 401 });
+    }
+
+    const isValid = validateGeniusPayWebhook(rawBody, signature, timestampNum);
     if (!isValid) {
       SecurityLogger.logSuspiciousActivity('webhook_invalid_signature', ip, { endpoint: 'geniuspay' });
       return NextResponse.json({ error: 'Signature invalide' }, { status: 401 });
