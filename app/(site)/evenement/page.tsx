@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { Reveal } from '@/components/Reveal';
 import { GoldFrame } from '@/components/GoldFrame';
 import { MapPin, Calendar, Users, Mail } from 'lucide-react';
+import { NavLink } from '@/components/NavLink';
 
 const PROGRAM = [
   { day: '20 — 23 Oct', title: 'Semaine J\u2019AFFIRME', text: 'Ateliers, répétitions et coaching des 36 mannequins et 5 designers formés pour l\u2019édition.' },
@@ -20,7 +21,7 @@ export default function EvenementPage() {
     <>
       <section className="relative flex h-[70vh] min-h-[440px] items-end overflow-hidden bg-noir">
         <div className="absolute inset-0">
-          <Image src="/images/committee-award.jpg" alt="Backstage J'AFFIRME" fill className="object-cover opacity-60" />
+          <Image src="/images/committee-award.jpg" alt="Backstage J'AFFIRME" fill className="object-cover opacity-60" loading="lazy" />
           <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/60 to-noir/40" />
         </div>
         <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-16 md:px-10">
@@ -42,7 +43,7 @@ export default function EvenementPage() {
           <Reveal>
             <GoldFrame inset={14}>
               <div className="relative aspect-[4/5] overflow-hidden">
-                <Image src="/images/podium-yawoto.jpg" alt="Défilé Yawoto" fill className="object-cover" />
+                <Image src="/images/podium-yawoto.jpg" alt="Défilé Yawoto" fill className="object-cover" loading="lazy" />
               </div>
             </GoldFrame>
           </Reveal>
@@ -118,12 +119,12 @@ export default function EvenementPage() {
             ))}
           </div>
           <Reveal delay={0.3} className="mt-14 text-center">
-            <a
+            <NavLink
               href="/billetterie"
-              className="inline-flex border border-porto px-9 py-3.5 font-body text-xs uppercase tracking-[0.25em] text-porto transition-colors hover:bg-porto hover:text-ivoire"
+              className="inline-flex border border-porto px-9 py-3.5 font-body text-xs uppercase tracking-[0.25em] text-porto transition-opacity hover:opacity-70"
             >
               Réserver ma place
-            </a>
+            </NavLink>
           </Reveal>
         </div>
       </section>

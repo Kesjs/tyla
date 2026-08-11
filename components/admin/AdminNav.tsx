@@ -29,7 +29,7 @@ export function AdminNav() {
     <aside className="flex h-full w-full flex-col justify-between border-r border-taupe/30 bg-noir-soft px-6 py-8 md:w-64">
       <div>
         <div className="flex items-center gap-3">
-          <Image src="/logo/tyla-logo-or-fond-noir.jpg" alt="T.Y.L.A" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
+          <Image src="/logo/tyla-logo-or-fond-noir.jpg" alt="T.Y.L.A" width={32} height={32} className="h-8 w-8 rounded-full object-cover" loading="lazy" />
           <div className="leading-none">
             <p className="font-display text-xs tracking-[0.25em] text-ivoire">T.Y.L.A</p>
             <p className="mt-1 font-body text-[9px] tracking-[0.15em] text-or/80">ADMIN J&apos;AFFIRME</p>

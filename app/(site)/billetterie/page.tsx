@@ -10,14 +10,32 @@ export default async function BilletteriePage({
 }: {
   searchParams: Record<string, string | string[] | undefined>;
 }) {
-  const supabase = createClient();
-  const { data } = await supabase
-    .from('tyla_ticket_categories')
-    .select('*')
-    .eq('active', true)
-    .order('display_order', { ascending: true });
+  let categories: TicketCategory[] = [];
+  let error: string | null = null;
 
-  const categories = (data ?? []) as TicketCategory[];
+  try {
+    const supabase = createClient();
+    const { data, error: supabaseError } = await supabase
+      .from('tyla_ticket_categories')
+      .select('*')
+      .eq('active', true)
+      .order('display_order', { ascending: true });
+
+    if (supabaseError) {
+      console.error('[Billetterie] Supabase error:', supabaseError);
+      error = `Erreur Supabase: ${supabaseError.message}`;
+    } else {
+      categories = (data ?? []) as TicketCategory[];
+      if (categories.length === 0) {
+        console.warn('[Billetterie] No active categories found');
+        error = 'Aucune catégorie de billet active trouvée';
+      }
+    }
+  } catch (err) {
+    console.error('[Billetterie] Exception:', err);
+    error = err instanceof Error ? err.message : 'Erreur inconnue';
+  }
+
   const paymentCancelled = searchParams.payment === 'cancelled';
 
   return (
@@ -43,7 +61,24 @@ export default async function BilletteriePage({
       </div>
 
       <div className="mx-auto mt-16 max-w-5xl px-6 md:px-10">
-        <TicketSelector categories={categories} paymentCancelled={paymentCancelled} />
+        {error ? (
+          <Reveal className="mx-auto max-w-lg border-l-2 border-porto bg-porto/5 pl-4 py-3">
+            <p className="font-body text-sm text-porto-light">
+              {error}
+            </p>
+            <p className="mt-3 font-body text-xs text-ivoire/50">
+              Contactez-nous à benin@tylafrica.com si le problème persiste.
+            </p>
+          </Reveal>
+        ) : categories.length === 0 ? (
+          <Reveal className="mx-auto max-w-lg border-l-2 border-or bg-or/5 pl-4 py-3">
+            <p className="font-body text-sm text-or/80">
+              La billetterie n'est pas encore disponible. Revenez bientôt !
+            </p>
+          </Reveal>
+        ) : (
+          <TicketSelector categories={categories} paymentCancelled={paymentCancelled} />
+        )}
       </div>
     </section>
   );

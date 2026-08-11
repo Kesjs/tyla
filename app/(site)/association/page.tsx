@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { Reveal } from '@/components/Reveal';
 import { GoldFrame } from '@/components/GoldFrame';
+import { NavLink } from '@/components/NavLink';
 
 const TIMELINE = [
   { year: '2020', text: 'Commencement et initiative du projet.' },
@@ -21,7 +22,7 @@ export default function AssociationPage() {
       {/* Hero */}
       <section className="relative flex h-[70vh] min-h-[440px] items-end overflow-hidden bg-noir">
         <div className="absolute inset-0">
-          <Image src="/images/atelier-02.jpg" alt="L'équipe T.Y.L.A" fill className="object-cover opacity-50" />
+          <Image src="/images/atelier-02.jpg" alt="L'équipe T.Y.L.A" fill className="object-cover opacity-50" loading="lazy" />
           <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/60 to-noir/40" />
         </div>
         <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-16 md:px-10">
@@ -126,12 +127,12 @@ export default function AssociationPage() {
               partage — chaque geste contribue à faire exister cette scène et à
               ouvrir la voie aux générations suivantes.
             </p>
-            <a
+            <NavLink
               href="/contact"
-              className="mt-8 inline-flex border border-ivoire px-8 py-3.5 font-body text-xs uppercase tracking-[0.25em] transition-colors hover:bg-ivoire hover:text-porto"
+              className="mt-8 inline-flex border border-ivoire px-8 py-3.5 font-body text-xs uppercase tracking-[0.25em] transition-opacity hover:opacity-70"
             >
               Nous rejoindre
-            </a>
+            </NavLink>
           </Reveal>
         </div>
       </section>

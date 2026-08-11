@@ -80,7 +80,7 @@ export default async function ContactPage() {
   return (
     <section className="relative overflow-hidden bg-noir py-32 pt-40 md:py-40 md:pt-48">
       <div className="absolute inset-0 opacity-20">
-        <Image src="/images/DSC_7657.jpg" alt="" fill className="object-cover" />
+        <Image src="/images/DSC_7657.jpg" alt="" fill className="object-cover" loading="lazy" />
         <div className="absolute inset-0 bg-noir/90" />
       </div>
 

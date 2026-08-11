@@ -1,4 +1,5 @@
 import { Reveal } from '@/components/Reveal';
+import { NavLink } from '@/components/NavLink';
 
 const CATS = [
   { name: 'VIP Prestige', price: 'dès 70 000 FCFA' },
@@ -32,7 +33,7 @@ export function TicketPreview() {
         </Reveal>
 
         <Reveal delay={0.3}>
-          <a
+          <NavLink
             href="/billetterie"
             className="group relative mt-12 inline-flex overflow-hidden border border-ivoire px-10 py-4 font-body text-xs uppercase tracking-[0.25em]"
           >
@@ -40,7 +41,7 @@ export function TicketPreview() {
             <span className="relative transition-colors duration-500 group-hover:text-porto">
               Voir tous les tarifs &amp; réserver
             </span>
-          </a>
+          </NavLink>
           <p className="mt-4 font-body text-xs text-ivoire/60">
             50 billets Standard et 10 VIP Gold au tarif Early Bird — puis passage automatique au tarif normal.
           </p>

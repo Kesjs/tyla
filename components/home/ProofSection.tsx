@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { Reveal } from '@/components/Reveal';
 import { GoldFrame } from '@/components/GoldFrame';
+import { NavLink } from '@/components/NavLink';
 
 export function ProofSection() {
   return (
@@ -14,6 +15,7 @@ export function ProofSection() {
                 alt="Défilé Maison Ipso — J'AFFIRME"
                 fill
                 className="object-cover"
+                loading="lazy"
               />
             </div>
           </GoldFrame>
@@ -48,12 +50,12 @@ export function ProofSection() {
             </p>
           </Reveal>
           <Reveal delay={0.4}>
-            <a
+            <NavLink
               href="/association"
               className="mt-8 inline-flex w-fit items-center gap-2 border-b border-porto pb-1 font-body text-xs uppercase tracking-[0.25em] text-porto transition-opacity hover:opacity-70"
             >
               Notre histoire
-            </a>
+            </NavLink>
           </Reveal>
         </div>
       </div>

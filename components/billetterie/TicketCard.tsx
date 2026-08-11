@@ -5,6 +5,7 @@ import QRCode from 'qrcode';
 import Image from 'next/image';
 import { Download, FileArchive } from 'lucide-react';
 import { generateTicketPdf } from '@/lib/pdf-utils';
+import { NavLink } from '@/components/NavLink';
 
 // ============================================================================
 // TicketCard - Version simple pour affichage individual (retrouver, etc.)
@@ -208,9 +209,9 @@ export function ConfirmationContent({ tickets }: { tickets: TicketData[] }) {
           <p className="mt-3 font-body text-xs text-ivoire/40">
             Pas d&apos;inquiétude si vous fermez cette page : vos billets restent
             accessibles via{' '}
-            <a href="/billetterie/retrouver" className="text-or underline-offset-4 hover:underline">
+            <NavLink href="/billetterie/retrouver" className="text-or underline-offset-4 hover:underline">
               Retrouver mes billets
-            </a>
+            </NavLink>
             .
           </p>
         </div>

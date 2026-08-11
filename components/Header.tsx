@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
+import { NavLink } from '@/components/NavLink';
 
 const NAV_LINKS = [
   { href: '/association', label: "L'Association" },
@@ -42,6 +43,7 @@ export function Header() {
             width={36}
             height={36}
             className="h-9 w-9 object-contain transition-transform duration-500 group-hover:scale-105"
+            priority
           />
           <span className="hidden flex-col leading-none sm:flex">
             <span className="font-display text-sm tracking-[0.3em] text-ivoire">T.Y.L.A</span>
@@ -53,20 +55,20 @@ export function Header() {
 
         <nav className="hidden items-center gap-10 md:flex">
           {NAV_LINKS.map((link) => (
-            <Link
+            <NavLink
               key={link.href}
               href={link.href}
-              className="font-body text-xs uppercase tracking-[0.2em] text-ivoire/80 transition-colors duration-300 hover:text-or"
+              className="font-body text-xs uppercase tracking-[0.2em] text-ivoire/80 hover:text-or"
             >
               {link.label}
-            </Link>
+            </NavLink>
           ))}
-          <Link
+          <NavLink
             href="/billetterie"
             className="border border-or px-5 py-2 font-body text-xs uppercase tracking-[0.2em] text-or transition-all duration-300 hover:bg-or hover:text-noir"
           >
             Réserver
-          </Link>
+          </NavLink>
         </nav>
 
         <button
@@ -89,22 +91,22 @@ export function Header() {
           >
             <div className="flex flex-col gap-1 px-6 py-6">
               {NAV_LINKS.map((link) => (
-                <Link
+                <NavLink
                   key={link.href}
                   href={link.href}
                   onClick={() => setOpen(false)}
                   className="py-3 font-body text-sm uppercase tracking-[0.2em] text-ivoire/80"
                 >
                   {link.label}
-                </Link>
+                </NavLink>
               ))}
-              <Link
+              <NavLink
                 href="/billetterie"
                 onClick={() => setOpen(false)}
                 className="mt-3 border border-or px-5 py-3 text-center font-body text-sm uppercase tracking-[0.2em] text-or"
               >
                 Réserver
-              </Link>
+              </NavLink>
             </div>
           </motion.div>
         )}

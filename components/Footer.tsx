@@ -1,6 +1,6 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import { Instagram, Facebook, Mail } from 'lucide-react';
+import { NavLink } from '@/components/NavLink';
 
 export function Footer() {
   return (
@@ -32,10 +32,10 @@ export function Footer() {
           <div>
             <p className="font-body text-xs uppercase tracking-[0.25em] text-or">Explorer</p>
             <ul className="mt-5 space-y-3 font-body text-sm text-ivoire/70">
-              <li><Link href="/association" className="hover:text-or">L&apos;Association</Link></li>
-              <li><Link href="/evenement" className="hover:text-or">L&apos;Événement</Link></li>
-              <li><Link href="/billetterie" className="hover:text-or">Billetterie</Link></li>
-              <li><Link href="/contact" className="hover:text-or">Contact</Link></li>
+              <li><NavLink href="/association" className="hover:text-or">L&apos;Association</NavLink></li>
+              <li><NavLink href="/evenement" className="hover:text-or">L&apos;Événement</NavLink></li>
+              <li><NavLink href="/billetterie" className="hover:text-or">Billetterie</NavLink></li>
+              <li><NavLink href="/contact" className="hover:text-or">Contact</NavLink></li>
             </ul>
           </div>
 
