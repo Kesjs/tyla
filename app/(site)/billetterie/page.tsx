@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { Reveal } from '@/components/Reveal';
-import { TicketSelector } from '@/components/billetterie/TicketSelector';
+import { TicketSelectorBoundary } from '@/components/billetterie/TicketSelectorBoundary';
 import type { TicketCategory } from '@/lib/tickets';
 
 export const revalidate = 0;
@@ -76,8 +76,14 @@ export default async function BilletteriePage({
               La billetterie n'est pas encore disponible. Revenez bientôt !
             </p>
           </Reveal>
+        ) : !categories || categories.length === 0 ? (
+          <Reveal className="mx-auto max-w-lg border-l-2 border-or bg-or/5 pl-4 py-3">
+            <p className="font-body text-sm text-or/80">
+              La billetterie n'est pas encore disponible. Revenez bientôt !
+            </p>
+          </Reveal>
         ) : (
-          <TicketSelector categories={categories} paymentCancelled={paymentCancelled} />
+          <TicketSelectorBoundary categories={categories} paymentCancelled={paymentCancelled} />
         )}
       </div>
     </section>
