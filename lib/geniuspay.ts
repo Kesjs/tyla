@@ -273,17 +273,33 @@ export async function handleGeniusPayWebhook(
 }> {
   try {
     const event = payload.event as string;
-    const data = payload.data as Record<string, unknown>;
-    const transaction = data?.transaction as Record<string, unknown>;
+    let data = payload.data as Record<string, unknown>;
+    
+    // Gérer deux formats possibles:
+    // Format 1: { data: { transaction: {...} } }
+    // Format 2: { data: {...} } (test webhook)
+    let transaction = data?.transaction as Record<string, unknown>;
+    
+    if (!transaction && data) {
+      // Si pas de transaction nested, les données sont directement dans data
+      transaction = data;
+    }
 
     if (!transaction) {
+      console.error('[GeniusPay Webhook] Missing transaction:', { event, data });
       throw new Error('Missing transaction in webhook payload');
     }
 
     const reference = transaction.reference as string;
     const status = transaction.status as string;
     const amount = transaction.amount as number;
-    const metadata = transaction.metadata as Record<string, unknown>;
+    
+    // Métadata peut être nested ou directement dans transaction
+    let metadata = transaction.metadata as Record<string, unknown>;
+    if (!metadata && data?.metadata) {
+      metadata = data.metadata as Record<string, unknown>;
+    }
+    
     const orderId = metadata?.order_id as string;
 
     console.log('[GeniusPay Webhook] Event received:', {
