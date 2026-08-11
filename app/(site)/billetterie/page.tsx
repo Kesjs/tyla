@@ -4,6 +4,7 @@ import { TicketSelectorBoundary } from '@/components/billetterie/TicketSelectorB
 import type { TicketCategory } from '@/lib/tickets';
 
 export const revalidate = 0;
+export const dynamic = 'force-dynamic';
 
 export default async function BilletteriePage({
   searchParams,
@@ -24,16 +25,19 @@ export default async function BilletteriePage({
     if (supabaseError) {
       console.error('[Billetterie] Supabase error:', supabaseError);
       error = `Erreur Supabase: ${supabaseError.message}`;
+    } else if (!data) {
+      console.warn('[Billetterie] No data returned from Supabase');
+      error = 'Les données des billets ne sont pas disponibles';
     } else {
-      categories = (data ?? []) as TicketCategory[];
+      categories = data as TicketCategory[];
       if (categories.length === 0) {
         console.warn('[Billetterie] No active categories found');
         error = 'Aucune catégorie de billet active trouvée';
       }
     }
   } catch (err) {
-    console.error('[Billetterie] Exception:', err);
-    error = err instanceof Error ? err.message : 'Erreur inconnue';
+    console.error('[Billetterie] Exception during fetch:', err);
+    error = err instanceof Error ? `Erreur: ${err.message}` : 'Une erreur est survenue lors du chargement';
   }
 
   const paymentCancelled = searchParams.payment === 'cancelled';
