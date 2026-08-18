@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Instagram, Facebook, Mail } from 'lucide-react';
+import { Instagram } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 
 export function Footer() {
@@ -51,33 +51,6 @@ export function Footer() {
                 className="text-ivoire/70 transition-colors hover:text-or"
               >
                 <Instagram size={20} />
-              </a>
-              <a
-                href="https://www.facebook.com/tyla.africa"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-                className="text-ivoire/70 transition-colors hover:text-or"
-              >
-                <Facebook size={20} />
-              </a>
-              <a
-                href="https://www.linkedin.com/company/the-young-leadership-of-africa/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn"
-                className="font-body text-sm text-ivoire/70 transition-colors hover:text-or flex items-center"
-              >
-                LinkedIn
-              </a>
-              <a
-                href="https://www.tiktok.com/@tylafrica?_r=1&_t=ZN-98xQ86OXW3a"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="TikTok"
-                className="font-body text-sm text-ivoire/70 transition-colors hover:text-or flex items-center"
-              >
-                TikTok
               </a>
             </div>
           </div>
