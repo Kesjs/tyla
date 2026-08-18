@@ -6,12 +6,16 @@ import { motion, useAnimationControls } from 'framer-motion';
 import { useState } from 'react';
 
 const GALLERY = [
-  { src: "/J'Affirme/TYLA-090.jpg", alt: 'Événement T.Y.L.A' },
-  { src: "/J'Affirme/TYLA_DÉFILÉ-02.jpg", alt: 'Défilé T.Y.L.A' },
-  { src: "/J'Affirme/TYLA-090.jpg", alt: 'Événement T.Y.L.A' },
-  { src: "/J'Affirme/TYLA_DÉFILÉ-02.jpg", alt: 'Défilé T.Y.L.A' },
-  { src: "/J'Affirme/TYLA-090.jpg", alt: 'Événement T.Y.L.A' },
-  { src: "/J'Affirme/TYLA_DÉFILÉ-02.jpg", alt: 'Défilé T.Y.L.A' },
+  { src: '/images/backstage-01.jpg', alt: 'Backstage T.Y.L.A' },
+  { src: '/images/podium-yawoto.jpg', alt: 'Podium Yawoto' },
+  { src: '/images/backstage-02.jpg', alt: 'Coulisses défilé' },
+  { src: '/images/podium-maison-ipso.jpg', alt: 'Podium Maison Ipso' },
+  { src: '/images/committee-award.jpg', alt: 'Remerciements équipe T.Y.L.A' },
+  { src: '/images/DSCF1413-1-.jpg', alt: 'Coulisses T.Y.L.A' },
+  { src: '/images/DSC_7618.jpg', alt: 'Préparation défilé' },
+  { src: '/images/DSC_7913-1-.jpg', alt: 'Moments défilé' },
+  { src: '/images/img-2522.jpg', alt: 'Événement T.Y.L.A' },
+  { src: '/images/img-2532.jpg', alt: 'Scène T.Y.L.A' },
 ];
 
 // Dupliquée pour la boucle infinie (2 copies pour un défilement continu sans coupure)

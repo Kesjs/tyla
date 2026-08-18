@@ -43,21 +43,7 @@ export function Hero() {
         animate="show"
         className="relative z-10 flex flex-col items-center px-6 text-center"
       >
-        <motion.div variants={item} className="flex items-center gap-3">
-          <Image
-            src="/logo/tyla-logo-blanc.png"
-            alt="T.Y.L.A"
-            width={48}
-            height={48}
-            className="h-12 w-12 object-contain"
-          />
-          <div className="text-left leading-none">
-            <p className="font-display text-sm tracking-[0.35em] text-ivoire">T.Y.L.A</p>
-            <p className="mt-1 font-body text-[10px] tracking-[0.25em] text-or">
-              THE YOUNG LEADERSHIP AFRICA
-            </p>
-          </div>
-        </motion.div>
+
 
         <motion.p
           variants={item}

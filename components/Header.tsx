@@ -10,9 +10,7 @@ import { NavLink } from '@/components/NavLink';
 const NAV_LINKS: { href: string; label: string; external?: boolean }[] = [
   { href: '/association', label: "L'Association" },
   { href: '/evenement', label: "L'Événement" },
-  { href: 'https://tylafrica.notion.site/FAQ-J-AFFIRME-FASHION-WEEK-1279989569fa802ea7caff27f6e87f2e', label: 'FAQ', external: true },
   { href: '/billetterie', label: 'Billetterie' },
-  { href: 'https://tylafrica.notion.site/ESPACE-PRESSE-M-DIA-1269989569fa80afbf8cc59530514108', label: 'Presse / Médias', external: true },
 ];
 
 export function Header() {

@@ -35,6 +35,7 @@ export function Footer() {
               <li><NavLink href="/association" className="hover:text-or">L&apos;Association</NavLink></li>
               <li><NavLink href="/evenement" className="hover:text-or">L&apos;Événement</NavLink></li>
               <li><NavLink href="/billetterie" className="hover:text-or">Billetterie</NavLink></li>
+              <li><NavLink href="https://tylafrica.notion.site/ESPACE-PRESSE-M-DIA-1269989569fa80afbf8cc59530514108" external className="hover:text-or">Presse / Médias</NavLink></li>
               <li><NavLink href="/contact" className="hover:text-or">Contact</NavLink></li>
             </ul>
           </div>
