@@ -10,7 +10,7 @@ export function Footer() {
           <div className="md:col-span-2">
             <div className="flex items-center gap-3">
               <Image
-                src="/logo/tyla-logo-blanc.png"
+                src="/J'Affirme/Logo/5.png"
                 alt="T.Y.L.A"
                 width={44}
                 height={44}
@@ -52,28 +52,40 @@ export function Footer() {
                 <Instagram size={20} />
               </a>
               <a
-                href="#"
+                href="https://www.facebook.com/tyla.africa"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Facebook"
                 className="text-ivoire/70 transition-colors hover:text-or"
               >
                 <Facebook size={20} />
               </a>
               <a
-                href="mailto:benin@tylafrica.com"
-                aria-label="Email"
-                className="text-ivoire/70 transition-colors hover:text-or"
+                href="https://www.linkedin.com/company/the-young-leadership-of-africa/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                className="font-body text-sm text-ivoire/70 transition-colors hover:text-or flex items-center"
               >
-                <Mail size={20} />
+                LinkedIn
+              </a>
+              <a
+                href="https://www.tiktok.com/@tylafrica?_r=1&_t=ZN-98xQ86OXW3a"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="TikTok"
+                className="font-body text-sm text-ivoire/70 transition-colors hover:text-or flex items-center"
+              >
+                TikTok
               </a>
             </div>
-            <p className="mt-5 font-body text-sm text-ivoire/50">@tyla.africa</p>
           </div>
         </div>
 
         <div className="hairline-or mt-14" />
         <div className="mt-6 flex flex-col items-center justify-between gap-3 font-body text-xs text-ivoire/40 md:flex-row">
           <p>&copy; {new Date().getFullYear()} T.Y.L.A — The Young Leadership Africa. Tous droits réservés.</p>
-          <p>J&apos;AFFIRME Fashion Week · Cotonou, Bénin</p>
+          <p>J&apos;AFFIRME — T.Y.L.A Fashion Week · Cotonou, Bénin.</p>
         </div>
       </div>
     </footer>

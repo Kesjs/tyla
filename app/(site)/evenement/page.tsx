@@ -3,16 +3,24 @@ import { Reveal } from '@/components/Reveal';
 import { GoldFrame } from '@/components/GoldFrame';
 import { MapPin, Calendar, Users, Mail } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "L'Événement | J'AFFIRME Fashion Week 2026",
+  description: "Découvrez le concept, le programme détaillé et les informations pratiques de la J'AFFIRME Fashion Week 2026 à Cotonou.",
+};
 
 const PROGRAM = [
-  { day: '20 — 23 Oct', title: 'Semaine J\u2019AFFIRME', text: 'Ateliers, répétitions et coaching des 36 mannequins et 5 designers formés pour l\u2019édition.' },
-  { day: '24 Oct', title: 'Le Défilé', text: 'Family Beach, Cotonou — 300 invités, podium, presse et partenaires internationaux.' },
+  { day: 'Mardi 20 Oct', title: 'Workshop Mannequin', text: '18h20-20h' },
+  { day: 'Mercredi 21 Oct', title: 'Workshop designer & identité', text: '18h30 – 20h' },
+  { day: 'Jeudi 22 Oct', title: 'Workshop photo', text: 'toute la journée' },
+  { day: '24 Oct', title: 'Le Défilé', text: '17h : ouverture des portes – 20h30 : Défilé' },
 ];
 
 const PRACTICAL = [
   { icon: Calendar, label: 'Date', value: 'Samedi 24 octobre 2026' },
-  { icon: MapPin, label: 'Lieu', value: 'Family Beach, Cotonou, Bénin' },
-  { icon: Users, label: 'Jauge', value: '300 places (public, invités, presse, partenaires)' },
+  { icon: MapPin, label: 'Lieu', value: 'Cotonou, Bénin' },
+  { icon: Users, label: 'Jauge', value: '200 places (public, invités, presse, partenaires)' },
   { icon: Mail, label: 'Contact', value: 'benin@tylafrica.com' },
 ];
 
@@ -21,14 +29,14 @@ export default function EvenementPage() {
     <>
       <section className="relative flex h-[70vh] min-h-[440px] items-end overflow-hidden bg-noir">
         <div className="absolute inset-0">
-          <Image src="/images/committee-award.jpg" alt="Backstage J'AFFIRME" fill className="object-cover opacity-60" loading="lazy" />
+          <Image src="/J'Affirme/TYLA-090.jpg" alt="Backstage J'AFFIRME" fill className="object-cover opacity-60" loading="lazy" />
           <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/60 to-noir/40" />
         </div>
         <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-16 md:px-10">
           <Reveal>
             <p className="font-body text-xs uppercase tracking-[0.35em] text-or">L&apos;Événement</p>
             <h1 className="mt-4 font-display text-4xl font-semibold text-ivoire sm:text-6xl">
-              J&apos;AFFIRME Fashion Week 2026
+              J&apos;AFFIRME — T.Y.L.A Fashion Week 2026.
             </h1>
             <p className="mt-4 max-w-xl font-body text-sm text-ivoire/60">
               Cotonou, Bénin — semaine du 20 au 24 octobre 2026 · défilé le 24 octobre
@@ -43,7 +51,7 @@ export default function EvenementPage() {
           <Reveal>
             <GoldFrame inset={14}>
               <div className="relative aspect-[4/5] overflow-hidden">
-                <Image src="/images/podium-yawoto.jpg" alt="Défilé Yawoto" fill className="object-cover" loading="lazy" />
+                <Image src="/J'Affirme/TYLA-090.jpg" alt="Défilé J'AFFIRME" fill className="object-cover" loading="lazy" />
               </div>
             </GoldFrame>
           </Reveal>
@@ -56,19 +64,16 @@ export default function EvenementPage() {
             </Reveal>
             <Reveal delay={0.15}>
               <p className="mt-6 font-body text-[15px] leading-relaxed text-taupe">
-                Un contraste saisissant entre la profondeur des racines africaines
-                et le minimalisme contemporain international — l&apos;axe Cotonou —
-                Genève / Lausanne. Silhouettes fières, typographie impériale,
-                captation axée sur le mouvement et l&apos;humain : la mode devient un
-                manifeste culturel et un outil de leadership pour la jeunesse
-                africaine.
+                Un contraste saisissant entre la profondeur des racines africaines et le minimalisme contemporain international.
+                « J&apos;AFFIRME ! » part d&apos;un constat simple : l&apos;Afrique et sa jeunesse créative n&apos;ont plus à se justifier, mais à s&apos;exprimer et
+                assumer leur place. Longtemps jugée secondaire, la mode africaine a pourtant influencé la mode mondiale, du corporate au
+                streetwear, de l’élégance classique aux esthétiques contemporaines. « J’AFFIRME ! » est une réponse à cette invisibilisation.
               </p>
             </Reveal>
             <Reveal delay={0.25}>
               <p className="mt-4 font-body text-[15px] leading-relaxed text-taupe">
-                L&apos;approche narrative met en lumière la métamorphose des 36
-                mannequins et 5 designers formés, passant des coulisses de
-                l&apos;apprentissage à l&apos;éclat de la scène.
+                Ce thème est un acte de reconnaissance et de projection : reconnaître ses racines, créer sans copier, influencer sans se renier. 
+                Le concept affirme une Afrique authentique et audacieuse, qui avance avec confiance. Plus qu&apos;un événement, c’est un manifeste.
               </p>
             </Reveal>
           </div>
@@ -83,6 +88,10 @@ export default function EvenementPage() {
             <h2 className="mt-5 font-display text-3xl font-semibold text-ivoire sm:text-4xl">
               Une semaine, un défilé
             </h2>
+            <p className="mx-auto mt-6 max-w-2xl font-body text-[15px] leading-relaxed text-ivoire/70">
+              Découvrez les 5 designers sélectionnés avec leur collection, à travers un programme détaillé
+              du 20 au 24 octobre, incluant 3 workshops ouverts au public.
+            </p>
           </Reveal>
           <div className="mt-16 space-y-px">
             {PROGRAM.map((p, i) => (

@@ -30,7 +30,7 @@ export function ProofSection() {
           <Reveal delay={0.1}>
             <h2 className="mt-5 font-display text-3xl font-semibold leading-tight sm:text-4xl">
               La preuve que la jeunesse africaine et sa diaspora peuvent créer,
-              exiger et rayonner — à leurs propres conditions.
+              exiger et rayonner à leurs propres conditions.
             </h2>
           </Reveal>
           <Reveal delay={0.2}>
@@ -43,7 +43,7 @@ export function ProofSection() {
           </Reveal>
           <Reveal delay={0.3}>
             <p className="mt-4 font-body text-[15px] leading-relaxed text-taupe">
-              Porté par T.Y.L.A — The Young Leadership Africa, association suisse
+              Porté par T.Y.L.A, The Young Leadership Africa, association suisse
               fondée par quatre femmes engagées pour la jeunesse et
               l&apos;entrepreneuriat africains, J&apos;AFFIRME construit un pont concret
               entre la Suisse, le Bénin et la diaspora africaine dans le monde.

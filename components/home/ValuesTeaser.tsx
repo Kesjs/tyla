@@ -7,11 +7,11 @@ const VALUES = [
   },
   {
     title: 'AGIR',
-    text: 'Organiser des événements, formations et opportunités concrètes qui font avancer les gens.',
+    text: 'Organiser des événements, formations et opportunités concrètes qui font avancer la communauté,',
   },
   {
     title: 'BÂTIR',
-    text: 'Soutenir la création d\u2019entreprises, de projets et d\u2019emplois durables sur le sol africain.',
+    text: 'Un réseau d\u2019entrepreneurs de qualité afin de créer des synergies et faire circuler les opportunités.',
   },
 ];
 

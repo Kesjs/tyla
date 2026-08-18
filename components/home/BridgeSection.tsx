@@ -3,9 +3,9 @@ import { Reveal } from '@/components/Reveal';
 
 const STATS = [
   { value: '24 Oct 2026', label: 'Date du défilé' },
-  { value: 'Family Beach', label: 'Cotonou, Bénin' },
-  { value: '300', label: 'Places disponibles' },
-  { value: '5 designers · 36 mannequins', label: 'Formés pour l\u2019édition' },
+  { value: 'Cotonou, Bénin', label: 'Lieu de l\'événement' },
+  { value: '200', label: 'Places disponibles' },
+  { value: '9 designers · 36 mannequins', label: 'Formés pour l\u2019édition' },
 ];
 
 export function BridgeSection() {
@@ -30,7 +30,7 @@ export function BridgeSection() {
         <Reveal delay={0.1}>
           <h2 className="mt-5 font-display text-3xl font-semibold leading-tight text-ivoire sm:text-4xl">
             Après deux éditions suisses saluées à Genève et Lausanne,
-            J&apos;AFFIRME pose pour la première fois sa scène au Bénin.
+            T.Y.L.A pose pour la première fois sa scène au Bénin avec son projet mode « J&apos;Affirme ».
           </h2>
         </Reveal>
         <Reveal delay={0.2}>

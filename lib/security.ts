@@ -43,21 +43,21 @@ export function validateAndSanitizeName(name: string): { valid: boolean; sanitiz
 }
 
 /**
- * Valide un numéro de téléphone béninois (8 chiffres après l'indicatif)
+ * Valide un numéro de téléphone international
  */
-export function validateBeninPhone(phone: string): { valid: boolean; error: string } {
+export function validateInternationalPhone(phone: string): { valid: boolean; error: string } {
   const digitsOnly = phone.replace(/\D/g, '');
   
   if (digitsOnly.length === 0) {
-    return { valid: false, error: 'Merci de renseigner votre numéro Mobile Money.' };
+    return { valid: false, error: 'Merci de renseigner votre numéro de téléphone.' };
   }
   
-  if (digitsOnly.length < 8) {
-    return { valid: false, error: `Numéro incomplet — il manque ${8 - digitsOnly.length} chiffre(s).` };
+  if (digitsOnly.length < 6) {
+    return { valid: false, error: 'Numéro incomplet — il manque des chiffres.' };
   }
   
-  if (digitsOnly.length > 8) {
-    return { valid: false, error: 'Numéro trop long — seuls 8 chiffres sont attendus après +229.' };
+  if (digitsOnly.length > 15) {
+    return { valid: false, error: 'Numéro trop long.' };
   }
   
   return { valid: true, error: '' };

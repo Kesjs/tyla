@@ -10,7 +10,7 @@ import {
   formatFcfa,
 } from '@/lib/tickets';
 import { Reveal } from '@/components/Reveal';
-import { isValidEmail, validateAndSanitizeName, validateBeninPhone } from '@/lib/security';
+import { isValidEmail, validateAndSanitizeName, validateInternationalPhone } from '@/lib/security';
 
 export function TicketSelector({ categories, paymentCancelled }: { categories: TicketCategory[], paymentCancelled?: boolean }) {
   const router = useRouter();
@@ -51,31 +51,9 @@ export function TicketSelector({ categories, paymentCancelled }: { categories: T
     setErrorMsg('');
   }
 
-  /** Formate la saisie en groupes de 2 chiffres pendant la frappe (XX XX XX XX), 8 chiffres max. */
   function handlePhoneChange(raw: string) {
-    const digitsOnly = raw.replace(/\D/g, '').slice(0, 8);
-    const grouped = digitsOnly.replace(/(\d{2})(?=\d)/g, '$1 ');
-    setPhone(grouped);
+    setPhone(raw);
     if (phoneError) setPhoneError('');
-  }
-
-  /**
-   * Valide le numéro local béninois : exactement 8 chiffres, saisis après le
-   * préfixe fixe +229 (01). Retourne un message d'erreur clair si invalide,
-   * ou une chaîne vide si le numéro est correct.
-   */
-  function validatePhone(value: string): string {
-    const digitsOnly = value.replace(/\D/g, '');
-    if (digitsOnly.length === 0) {
-      return 'Merci de renseigner votre numéro Mobile Money.';
-    }
-    if (digitsOnly.length < 8) {
-      return `Numéro incomplet — il manque ${8 - digitsOnly.length} chiffre(s) (8 chiffres attendus après +229 (01)).`;
-    }
-    if (digitsOnly.length > 8) {
-      return 'Numéro trop long — seuls 8 chiffres sont attendus après +229 (01).';
-    }
-    return '';
   }
 
   function pick(cat: TicketCategory) {
@@ -124,15 +102,14 @@ export function TicketSelector({ categories, paymentCancelled }: { categories: T
         return;
       }
 
-      const phoneValidation = validateBeninPhone(phone.replace(/\D/g, ''));
+      const phoneValidation = validateInternationalPhone(phone.replace(/\D/g, ''));
       if (!phoneValidation.valid) {
         setPhoneError(phoneValidation.error);
         setStep('form');
         return;
       }
 
-      const digitsOnly = phone.replace(/\D/g, '');
-      const fullPhone = `+229 01 ${digitsOnly.slice(0, 2)} ${digitsOnly.slice(2, 4)} ${digitsOnly.slice(4, 6)} ${digitsOnly.slice(6, 8)}`;
+      const fullPhone = phone.trim();
 
       console.log('[submitOrder] Creating order:', { categoryId: selected.id, quantity, name, email });
 
@@ -241,6 +218,12 @@ export function TicketSelector({ categories, paymentCancelled }: { categories: T
             const soldOut = remaining <= 0;
             const earlyBird = isEarlyBirdAvailable(cat);
             const price = effectivePrice(cat);
+            const progressPercent = Math.min(100, Math.round((cat.sold_count / (cat.quota_total || 1)) * 100)) || 0;
+            
+            let desc = cat.description || '';
+            if (cat.name.match(/vip gold/i)) desc = desc.replace(/Professionnels établis,\s*diaspora,\s*mentors/i, '');
+            if (cat.name.match(/standard/i)) desc = desc.replace(/Jeunes professionnels,\s*créatifs,\s*entrepreneurs,\s*grand public/i, '');
+
             return (
               <Reveal key={cat.id} delay={i * 0.08}>
                 <div
@@ -256,8 +239,8 @@ export function TicketSelector({ categories, paymentCancelled }: { categories: T
                       </span>
                     )}
                   </div>
-                  {cat.description && (
-                    <p className="mt-2 font-body text-xs text-ivoire/50">{cat.description}</p>
+                  {desc && (
+                    <p className="mt-2 font-body text-xs text-ivoire/50">{desc}</p>
                   )}
                   {cat.included_items && (
                     <p className="mt-4 font-body text-sm leading-relaxed text-ivoire/70">
@@ -275,9 +258,15 @@ export function TicketSelector({ categories, paymentCancelled }: { categories: T
                         </p>
                       )}
                     </div>
-                    <p className="font-body text-xs text-ivoire/40">
-                      {soldOut ? 'Épuisé' : `${remaining} place(s) restante(s)`}
-                    </p>
+                    <div className="text-right">
+                      <p className="font-body text-xs text-ivoire/40">
+                        {soldOut ? 'Épuisé' : `${remaining} place(s) restante(s)`}
+                      </p>
+                      <div className="mt-2 h-1 w-24 bg-taupe/20 ml-auto overflow-hidden">
+                        <div className="h-full bg-or" style={{ width: `${progressPercent}%` }} />
+                      </div>
+                      <p className="mt-1 font-body text-[9px] text-or/60">{progressPercent}% vendus</p>
+                    </div>
                   </div>
                   <button
                     disabled={soldOut}
@@ -352,26 +341,20 @@ export function TicketSelector({ categories, paymentCancelled }: { categories: T
               {nameError && <p className="mt-2 font-body text-xs text-porto-light">{nameError}</p>}
             </div>
             <div>
-              <label className="font-body text-xs uppercase tracking-[0.2em] text-ivoire/50">Téléphone (Mobile Money)</label>
+              <label className="font-body text-xs uppercase tracking-[0.2em] text-ivoire/50">Téléphone (Mobile Money ou International)</label>
               <div className="mt-2 flex">
-                <div className="flex items-center gap-2 border-b border-taupe bg-noir-soft px-4 py-2.5">
-                  <span className="text-xl">🇧🇯</span>
-                  <span className="font-body text-sm text-ivoire/70">+229</span>
-                  <span className="font-body text-sm text-or/70">(01)</span>
-                </div>
                 <input
                   required
                   type="tel"
-                  inputMode="numeric"
-                  placeholder="XX XX XX XX"
+                  placeholder="ex: +33 6 12 34 56 78 ou +229 97 12 34 56"
                   value={phone}
                   onChange={(e) => handlePhoneChange(e.target.value)}
                   onBlur={() => {
-                    const validation = validateBeninPhone(phone.replace(/\D/g, ''));
+                    const validation = validateInternationalPhone(phone.replace(/\D/g, ''));
                     setPhoneError(validation.error);
                   }}
                   aria-invalid={!!phoneError}
-                  className={`flex-1 border-b bg-transparent py-2.5 pl-4 font-body text-ivoire outline-none ${
+                  className={`w-full border-b bg-transparent py-2.5 font-body text-ivoire outline-none ${
                     phoneError ? 'border-porto focus:border-porto' : 'border-taupe focus:border-or'
                   }`}
                 />
@@ -380,7 +363,7 @@ export function TicketSelector({ categories, paymentCancelled }: { categories: T
                 <p className="mt-2 font-body text-xs text-porto-light">{phoneError}</p>
               ) : (
                 <p className="mt-2 font-body text-xs text-ivoire/30">
-                  8 chiffres, sans le 01 (ex : 97 12 34 56)
+                  Avec l&apos;indicatif pays (ex: +33, +229)
                 </p>
               )}
             </div>

@@ -42,9 +42,7 @@ export function TicketPreview() {
               Voir tous les tarifs &amp; réserver
             </span>
           </NavLink>
-          <p className="mt-4 font-body text-xs text-ivoire/60">
-            50 billets Standard et 10 VIP Gold au tarif Early Bird — puis passage automatique au tarif normal.
-          </p>
+
         </Reveal>
       </div>
     </section>

@@ -2,6 +2,12 @@ import { createClient } from '@/lib/supabase/server';
 import { Reveal } from '@/components/Reveal';
 import { TicketSelectorBoundary } from '@/components/billetterie/TicketSelectorBoundary';
 import type { TicketCategory } from '@/lib/tickets';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "Billetterie | J'AFFIRME Fashion Week 2026",
+  description: "Réservez votre place pour la J'AFFIRME Fashion Week 2026. Paiement sécurisé via Mobile Money et carte.",
+};
 
 export const revalidate = 0;
 export const dynamic = 'force-dynamic';
@@ -51,7 +57,7 @@ export default async function BilletteriePage({
             Réservez votre place.
           </h1>
           <p className="mx-auto mt-5 max-w-xl font-body text-sm leading-relaxed text-ivoire/60">
-            24 octobre 2026 · Family Beach, Cotonou. Paiement sécurisé par
+            24 octobre 2026 · Cotonou, Bénin. Paiement sécurisé par
             Mobile Money ou carte. Votre billet (avec QR code) vous est
             présenté immédiatement après paiement.
           </p>

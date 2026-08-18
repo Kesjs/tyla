@@ -79,7 +79,7 @@ export function TicketCard({
           <p className="mt-1 font-body text-xs text-taupe">{buyerName}</p>
         </div>
         <p className="font-body text-[11px] uppercase tracking-[0.15em] text-taupe/70">
-          24 octobre 2026 · Family Beach, Cotonou
+          24 octobre 2026 · Cotonou, Bénin
         </p>
 
         <button
@@ -173,7 +173,7 @@ export function ConfirmationContent({ tickets }: { tickets: TicketData[] }) {
       }
 
       // Ajouter un fichier d'info
-      const infoContent = `J'AFFIRME 2026 - Billets\n\nDate: 24 octobre 2026\nLieu: Family Beach, Cotonou\n\nNombre de billets: ${tickets.length}\n\nPrésentez le QR code de chaque billet à l'entrée.\n\nContactez: benin@tylafrica.com`;
+      const infoContent = `J'AFFIRME 2026 - Billets\n\nDate: 24 octobre 2026\nLieu: Cotonou, Bénin\n\nNombre de billets: ${tickets.length}\n\nPrésentez le QR code de chaque billet à l'entrée.\n\nContactez: benin@tylafrica.com`;
       zip.file('README.txt', infoContent);
 
       // Générer et télécharger le ZIP
@@ -274,7 +274,7 @@ export function ConfirmationContent({ tickets }: { tickets: TicketData[] }) {
                   <p className="mt-1 font-body text-xs text-taupe">{ticket.buyerName}</p>
                 </div>
                 <p className="font-body text-[11px] uppercase tracking-[0.15em] text-taupe/70">
-                  24 octobre 2026 · Family Beach, Cotonou
+                  24 octobre 2026 · Cotonou, Bénin
                 </p>
 
                 {/* Bouton télécharger */}

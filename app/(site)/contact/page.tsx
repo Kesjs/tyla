@@ -1,11 +1,17 @@
 import Image from 'next/image';
-import { Mail, Phone, Instagram, MapPin } from 'lucide-react';
+import { Mail, Phone, Instagram, MapPin, Facebook, Linkedin } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { Reveal } from '@/components/Reveal';
 import { ContactForm } from '@/components/contact/ContactForm';
 import type { ContactInfo } from '@/lib/tickets';
 import { getCommitteeMembers } from '@/lib/committee';
 import type { CommitteeMember } from '@/lib/committee';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "Contact & Partenariats | J'AFFIRME Fashion Week 2026",
+  description: "Restez informés sur l'événement ou devenez partenaire. L'équipe T.Y.L.A répond à vos questions.",
+};
 
 // Données par défaut en attendant que la table soit créée
 const DEFAULT_COMMITTEE: CommitteeMember[] = [
@@ -27,15 +33,7 @@ const DEFAULT_COMMITTEE: CommitteeMember[] = [
     display_order: 2,
     active: true
   },
-  { 
-    initials: 'IK', 
-    name: 'Ismael Kane', 
-    role: 'Trésorier',
-    email: 'tresorier@tylafrica.com',
-    phone: '+229 XX XX XX XX',
-    display_order: 3,
-    active: true
-  },
+
   { 
     initials: 'ET', 
     name: 'Eunice Tchibozo', 
@@ -75,7 +73,8 @@ export default async function ContactPage() {
   ]);
 
   const contact = contactData.data as ContactInfo | null;
-  const committee = committeeData && committeeData.length > 0 ? committeeData : DEFAULT_COMMITTEE;
+  let committee = committeeData && committeeData.length > 0 ? committeeData : DEFAULT_COMMITTEE;
+  committee = committee.filter(m => m.name !== 'Ismael Kane');
 
   return (
     <section className="relative overflow-hidden bg-noir py-32 pt-40 md:py-40 md:pt-48">
@@ -91,8 +90,7 @@ export default async function ContactPage() {
             Parlons-en.
           </h1>
           <p className="mt-5 max-w-sm font-body text-sm leading-relaxed text-ivoire/60">
-            Presse, partenariats, sponsoring ou simple question sur la
-            billetterie — l&apos;équipe T.Y.L.A vous répond.
+            Restez informés sur l&apos;événement ou devenez partenaire.
           </p>
         </Reveal>
 
@@ -109,15 +107,6 @@ export default async function ContactPage() {
                     </span>
                   </a>
                 )}
-                {contact?.phone_1 && (
-                  <a href={`tel:${contact.phone_1}`} className="flex items-center gap-4 group">
-                    <Phone className="text-or" size={18} />
-                    <span className="font-body text-sm text-ivoire/80 group-hover:text-or">
-                      {contact.phone_1}
-                      {contact.phone_2 ? ` · ${contact.phone_2}` : ''}
-                    </span>
-                  </a>
-                )}
                 {contact?.instagram && (
                   <a
                     href={`https://instagram.com/${contact.instagram.replace('@', '')}`}
@@ -131,6 +120,28 @@ export default async function ContactPage() {
                     </span>
                   </a>
                 )}
+                <a
+                  href="https://www.facebook.com/tyla.africa"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-4 group"
+                >
+                  <Facebook className="text-or" size={18} />
+                  <span className="font-body text-sm text-ivoire/80 group-hover:text-or">
+                    Tyla Africa
+                  </span>
+                </a>
+                <a
+                  href="https://www.linkedin.com/company/the-young-leadership-of-africa/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-4 group"
+                >
+                  <Linkedin className="text-or" size={18} />
+                  <span className="font-body text-sm text-ivoire/80 group-hover:text-or">
+                    T.Y.L.A
+                  </span>
+                </a>
                 {contact?.address && (
                   <div className="flex items-center gap-4">
                     <MapPin className="text-or" size={18} />

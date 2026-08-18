@@ -7,11 +7,12 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 
-const NAV_LINKS = [
+const NAV_LINKS: { href: string; label: string; external?: boolean }[] = [
   { href: '/association', label: "L'Association" },
   { href: '/evenement', label: "L'Événement" },
+  { href: 'https://tylafrica.notion.site/FAQ-J-AFFIRME-FASHION-WEEK-1279989569fa802ea7caff27f6e87f2e', label: 'FAQ', external: true },
   { href: '/billetterie', label: 'Billetterie' },
-  { href: '/contact', label: 'Contact' },
+  { href: 'https://tylafrica.notion.site/ESPACE-PRESSE-M-DIA-1269989569fa80afbf8cc59530514108', label: 'Presse / Médias', external: true },
 ];
 
 export function Header() {
@@ -58,6 +59,7 @@ export function Header() {
             <NavLink
               key={link.href}
               href={link.href}
+              external={link.external}
               className="font-body text-xs uppercase tracking-[0.2em] text-ivoire/80 hover:text-or"
             >
               {link.label}
@@ -94,6 +96,7 @@ export function Header() {
                 <NavLink
                   key={link.href}
                   href={link.href}
+                  external={link.external}
                   onClick={() => setOpen(false)}
                   className="py-3 font-body text-sm uppercase tracking-[0.2em] text-ivoire/80"
                 >

@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
+import { Countdown } from './Countdown';
 
 const container = {
   hidden: {},
@@ -26,7 +27,7 @@ export function Hero() {
         transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
       >
         <Image
-          src="/images/committee-award.jpg"
+          src="/J'Affirme/TYLA_DÉFILÉ-02.jpg"
           alt="Défilé T.Y.L.A J'AFFIRME"
           fill
           priority
@@ -70,6 +71,17 @@ export function Hero() {
           <h1 className="font-display text-[3.2rem] font-semibold leading-[0.95] tracking-tight text-ivoire sm:text-8xl md:text-9xl">
             J&apos;AFFIRME !
           </h1>
+        </motion.div>
+
+        <motion.p
+          variants={item}
+          className="mt-6 font-display text-xl sm:text-2xl tracking-[0.2em] text-ivoire"
+        >
+          24.10.26
+        </motion.p>
+
+        <motion.div variants={item} className="mt-8 w-full">
+          <Countdown targetDate="2026-10-24T18:30:00" />
         </motion.div>
 
         <motion.p

@@ -12,17 +12,20 @@ export function NavLink({
   children,
   className = '',
   onClick,
+  external = false,
 }: {
   href: string;
   children: ReactNode;
   className?: string;
   onClick?: () => void;
+  external?: boolean;
 }) {
   return (
     <Link
       href={href}
       className={`transition-opacity duration-150 active:opacity-60 ${className}`}
       onClick={onClick}
+      {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
     >
       {children}
     </Link>

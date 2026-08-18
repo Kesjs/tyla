@@ -4,7 +4,7 @@ import { effectivePrice, placesRemaining, type TicketCategory } from '@/lib/tick
 import { 
   isValidEmail, 
   validateAndSanitizeName, 
-  validateBeninPhone,
+  validateInternationalPhone,
   SecurityLogger 
 } from '@/lib/security';
 import { rateLimiter, RATE_LIMITS, getClientIP } from '@/lib/rate-limit';
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Validation du téléphone
-    const phoneValidation = validateBeninPhone(buyerPhone.replace(/\D/g, '').slice(-8));
+    const phoneValidation = validateInternationalPhone(buyerPhone.replace(/\D/g, ''));
     if (!phoneValidation.valid) {
       return NextResponse.json({ error: phoneValidation.error }, { status: 400 });
     }
