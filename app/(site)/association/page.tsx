@@ -106,7 +106,7 @@ export default function AssociationPage() {
             </h2>
             <p className="mt-5 font-body text-[15px] leading-relaxed text-taupe">
               T.Y.L.A se distingue par des valeurs fortes qui orientent chaque
-              action et initiative de notre association — de l&apos;innovation à
+              action et initiative de notre association de l&apos;innovation à
               l&apos;engagement communautaire, en passant par l&apos;excellence et la
               solidarité entre jeunes Africains.
             </p>

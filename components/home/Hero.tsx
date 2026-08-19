@@ -49,7 +49,7 @@ export function Hero() {
           variants={item}
           className="mt-8 font-body text-xs uppercase tracking-[0.4em] text-or"
         >
-          Fashion Week 2026 · Cotonou
+          TYLA Fashion Week 2026 · Cotonou
         </motion.p>
 
         <motion.div variants={item} className="relative mt-6">

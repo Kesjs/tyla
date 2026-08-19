@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Instagram } from 'lucide-react';
+import { Instagram, Facebook } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 
 export function Footer() {
@@ -10,7 +10,7 @@ export function Footer() {
           <div className="md:col-span-2">
             <div className="flex items-center gap-3">
               <Image
-                src="/J'Affirme/Logo/5.png"
+                src="/logo-tyla.png"
                 alt="T.Y.L.A"
                 width={44}
                 height={44}
@@ -35,7 +35,7 @@ export function Footer() {
               <li><NavLink href="/association" className="hover:text-or">L&apos;Association</NavLink></li>
               <li><NavLink href="/evenement" className="hover:text-or">L&apos;Événement</NavLink></li>
               <li><NavLink href="/billetterie" className="hover:text-or">Billetterie</NavLink></li>
-              <li><NavLink href="https://tylafrica.notion.site/ESPACE-PRESSE-M-DIA-1269989569fa80afbf8cc59530514108" external className="hover:text-or">Presse / Médias</NavLink></li>
+              <li><NavLink href="/presse" className="hover:text-or">Presse</NavLink></li>
               <li><NavLink href="/contact" className="hover:text-or">Contact</NavLink></li>
             </ul>
           </div>
@@ -48,9 +48,36 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="text-ivoire/70 transition-colors hover:text-or"
+                className="text-ivoire/70 transition-colors hover:text-or flex items-center"
               >
                 <Instagram size={20} />
+              </a>
+              <a
+                href="https://www.facebook.com/tyla.africa"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="text-ivoire/70 transition-colors hover:text-or flex items-center"
+              >
+                <Facebook size={20} />
+              </a>
+              <a
+                href="https://www.linkedin.com/company/the-young-leadership-of-africa/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                className="font-body text-sm text-ivoire/70 transition-colors hover:text-or flex items-center"
+              >
+                LinkedIn
+              </a>
+              <a
+                href="https://www.tiktok.com/@tylafrica?_r=1&_t=ZN-98xQ86OXW3a"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="TikTok"
+                className="font-body text-sm text-ivoire/70 transition-colors hover:text-or flex items-center"
+              >
+                TikTok
               </a>
             </div>
           </div>

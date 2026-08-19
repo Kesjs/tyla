@@ -37,7 +37,7 @@ export function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-10">
         <Link href="/" className="flex items-center gap-3 group" onClick={() => setOpen(false)}>
           <Image
-            src="/logo/tyla-logo-blanc.png"
+            src="/logo-tyla.png"
             alt="T.Y.L.A"
             width={36}
             height={36}

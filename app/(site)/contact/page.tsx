@@ -128,7 +128,7 @@ export default async function ContactPage() {
                 >
                   <Facebook className="text-or" size={18} />
                   <span className="font-body text-sm text-ivoire/80 group-hover:text-or">
-                    Tyla Africa
+                    Tila
                   </span>
                 </a>
                 <a
@@ -169,10 +169,6 @@ export default async function ContactPage() {
                         <a href={`mailto:${member.email}`} className="flex items-center gap-2 text-sm text-ivoire/70 hover:text-or transition-colors">
                           <Mail size={14} />
                           <span className="truncate">{member.email}</span>
-                        </a>
-                        <a href={`tel:${member.phone}`} className="flex items-center gap-2 text-sm text-ivoire/70 hover:text-or transition-colors">
-                          <Phone size={14} />
-                          <span>{member.phone}</span>
                         </a>
                       </div>
                     </div>

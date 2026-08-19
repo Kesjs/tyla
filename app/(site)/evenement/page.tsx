@@ -11,10 +11,10 @@ export const metadata: Metadata = {
 };
 
 const PROGRAM = [
-  { day: 'Mardi 20 Oct', title: 'Workshop Mannequin', text: '18h20-20h' },
+  { day: 'Mardi 20 Oct', title: 'Workshop Mannequin', text: '18h30-20h' },
   { day: 'Mercredi 21 Oct', title: 'Workshop designer & identité', text: '18h30 – 20h' },
   { day: 'Jeudi 22 Oct', title: 'Workshop photo', text: 'toute la journée' },
-  { day: '24 Oct', title: 'Le Défilé', text: '17h : ouverture des portes – 20h30 : Défilé' },
+  { day: '24 Oct', title: 'Le Défilé', text: '16h30 : ouverture des portes – 20h30 : Défilé' },
 ];
 
 const PRACTICAL = [
@@ -36,10 +36,10 @@ export default function EvenementPage() {
           <Reveal>
             <p className="font-body text-xs uppercase tracking-[0.35em] text-or">L&apos;Événement</p>
             <h1 className="mt-4 font-display text-4xl font-semibold text-ivoire sm:text-6xl">
-              J&apos;AFFIRME — T.Y.L.A Fashion Week 2026.
+              J&apos;AFFIRME T.Y.L.A Fashion Week 2026.
             </h1>
             <p className="mt-4 max-w-xl font-body text-sm text-ivoire/60">
-              Cotonou, Bénin — semaine du 20 au 24 octobre 2026 · défilé le 24 octobre
+              Cotonou, Bénin semaine du 20 au 24 octobre 2026 · défilé le 24 octobre
             </p>
           </Reveal>
         </div>
