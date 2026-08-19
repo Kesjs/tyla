@@ -218,7 +218,6 @@ export function TicketSelector({ categories, paymentCancelled }: { categories: T
             const soldOut = remaining <= 0;
             const earlyBird = isEarlyBirdAvailable(cat);
             const price = effectivePrice(cat);
-            const progressPercent = Math.min(100, Math.round((cat.sold_count / (cat.quota_total || 1)) * 100)) || 0;
             
             let desc = cat.description || '';
             if (cat.name.match(/vip gold/i)) desc = desc.replace(/Professionnels établis,\s*diaspora,\s*mentors/i, '');
@@ -262,10 +261,6 @@ export function TicketSelector({ categories, paymentCancelled }: { categories: T
                       <p className="font-body text-xs text-ivoire/40">
                         {soldOut ? 'Épuisé' : `${remaining} place(s) restante(s)`}
                       </p>
-                      <div className="mt-2 h-1 w-24 bg-taupe/20 ml-auto overflow-hidden">
-                        <div className="h-full bg-or" style={{ width: `${progressPercent}%` }} />
-                      </div>
-                      <p className="mt-1 font-body text-[9px] text-or/60">{progressPercent}% vendus</p>
                     </div>
                   </div>
                   <button
