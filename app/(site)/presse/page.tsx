@@ -52,17 +52,8 @@ export default function PressePage() {
             </h2>
           </Reveal>
           
-          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-14 grid gap-6 sm:grid-cols-2">
             <Reveal delay={0.1}>
-              <a href="#" className="group flex h-full flex-col border border-taupe/20 bg-noir-soft p-8 transition-colors hover:border-or/50">
-                <Download className="text-or mb-6" size={28} />
-                <h3 className="font-display text-xl font-semibold text-ivoire">Logos T.Y.L.A</h3>
-                <p className="mt-2 flex-1 font-body text-sm text-ivoire/60">Versions vectorielles et PNG des logos officiels pour impression et web.</p>
-                <span className="mt-6 inline-flex font-body text-xs uppercase tracking-wider text-or group-hover:underline">Télécharger le pack (ZIP)</span>
-              </a>
-            </Reveal>
-            
-            <Reveal delay={0.2}>
               <a href="#" className="group flex h-full flex-col border border-taupe/20 bg-noir-soft p-8 transition-colors hover:border-or/50">
                 <FileText className="text-or mb-6" size={28} />
                 <h3 className="font-display text-xl font-semibold text-ivoire">Dossier de Presse</h3>
@@ -71,7 +62,7 @@ export default function PressePage() {
               </a>
             </Reveal>
 
-            <Reveal delay={0.3}>
+            <Reveal delay={0.2}>
               <a href="#" className="group flex h-full flex-col border border-taupe/20 bg-noir-soft p-8 transition-colors hover:border-or/50">
                 <Download className="text-or mb-6" size={28} />
                 <h3 className="font-display text-xl font-semibold text-ivoire">Photos Officielles</h3>
@@ -125,10 +116,10 @@ export default function PressePage() {
               n&apos;hésitez pas à contacter notre responsable média, Julia Lavenette.
             </p>
             <a
-              href="mailto:media@tylafrica.com"
+              href="mailto:info@tylafrica.com"
               className="mt-8 inline-flex items-center gap-3 border border-ivoire px-8 py-3.5 font-body text-xs uppercase tracking-[0.25em] transition-opacity hover:opacity-70"
             >
-              <Mail size={16} /> media@tylafrica.com
+              <Mail size={16} /> info@tylafrica.com
             </a>
           </Reveal>
         </div>

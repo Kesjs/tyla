@@ -14,7 +14,7 @@ const PROGRAM = [
   { day: 'Mardi 20 Oct', title: 'Workshop Mannequin', text: '18h30-20h' },
   { day: 'Mercredi 21 Oct', title: 'Workshop designer & identité', text: '18h30 – 20h' },
   { day: 'Jeudi 22 Oct', title: 'Workshop photo', text: 'toute la journée' },
-  { day: '24 Oct', title: 'Le Défilé', text: '16h30 : ouverture des portes – 20h30 : Défilé' },
+  { day: '24 Oct', title: 'Le Défilé', text: '16h30 : ouverture des portes' },
 ];
 
 const PRACTICAL = [

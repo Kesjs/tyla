@@ -20,7 +20,7 @@ const DEFAULT_COMMITTEE: CommitteeMember[] = [
     name: 'Tatiana Monteiro', 
     role: 'Présidente',
     email: 'presidente@tylafrica.com',
-    phone: '+229 XX XX XX XX',
+    phone: '',
     display_order: 1,
     active: true
   },
@@ -29,7 +29,7 @@ const DEFAULT_COMMITTEE: CommitteeMember[] = [
     name: 'Myriam Tsumbu Nzanzala', 
     role: 'Vice-Présidente',
     email: 'vice-presidente@tylafrica.com',
-    phone: '+229 XX XX XX XX',
+    phone: '',
     display_order: 2,
     active: true
   },
@@ -39,7 +39,7 @@ const DEFAULT_COMMITTEE: CommitteeMember[] = [
     name: 'Eunice Tchibozo', 
     role: 'Resp. Projet et Développement',
     email: 'projet@tylafrica.com',
-    phone: '+229 XX XX XX XX',
+    phone: '',
     display_order: 4,
     active: true
   },
@@ -48,7 +48,7 @@ const DEFAULT_COMMITTEE: CommitteeMember[] = [
     name: 'Benedicte Okonda', 
     role: 'Secrétaire Générale',
     email: 'secretaire@tylafrica.com',
-    phone: '+229 XX XX XX XX',
+    phone: '',
     display_order: 5,
     active: true
   },
@@ -56,8 +56,8 @@ const DEFAULT_COMMITTEE: CommitteeMember[] = [
     initials: 'JL', 
     name: 'Julia Lavenette', 
     role: 'Responsable Média',
-    email: 'media@tylafrica.com',
-    phone: '+229 XX XX XX XX',
+    email: 'info@tylafrica.com',
+    phone: '',
     display_order: 6,
     active: true
   },
