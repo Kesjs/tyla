@@ -39,7 +39,7 @@ export function Countdown({ targetDate }: { targetDate: string }) {
   }, [targetDate]);
 
   if (!isMounted) {
-    return <div className="h-16" />; // placeholder height
+    return <div className="h-14 sm:h-16" />; // placeholder height
   }
 
   const timeBlocks = [
@@ -50,13 +50,13 @@ export function Countdown({ targetDate }: { targetDate: string }) {
   ];
 
   return (
-    <div className="mt-8 flex gap-4 sm:gap-8 justify-center">
+    <div className="flex gap-3 sm:gap-6 md:gap-8 justify-center">
       {timeBlocks.map((block) => (
         <div key={block.label} className="flex flex-col items-center">
-          <div className="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center border border-or/30 bg-noir/40 backdrop-blur-sm text-ivoire">
-            <span className="font-display text-xl sm:text-2xl">{block.value.toString().padStart(2, '0')}</span>
+          <div className="flex h-11 w-11 sm:h-13 sm:w-13 md:h-14 md:w-14 items-center justify-center border border-or/30 bg-noir/40 backdrop-blur-sm text-ivoire shadow-sm">
+            <span className="font-display text-lg sm:text-xl md:text-2xl font-medium">{block.value.toString().padStart(2, '0')}</span>
           </div>
-          <span className="mt-2 font-body text-[10px] sm:text-xs uppercase tracking-widest text-or/70">{block.label}</span>
+          <span className="mt-1 font-body text-[9px] sm:text-[10px] uppercase tracking-widest text-or/80">{block.label}</span>
         </div>
       ))}
     </div>

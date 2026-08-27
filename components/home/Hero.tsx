@@ -19,7 +19,7 @@ const item = {
 
 export function Hero() {
   return (
-    <section className="relative flex h-[100svh] min-h-[640px] w-full items-center justify-center overflow-hidden bg-noir">
+    <section className="relative flex min-h-[100svh] w-full items-center justify-center overflow-hidden bg-noir pt-20 pb-8 sm:pt-24 sm:pb-10">
       <motion.div
         className="absolute inset-0"
         initial={{ scale: 1.12, opacity: 0 }}
@@ -33,7 +33,7 @@ export function Hero() {
           priority
           className="object-cover object-[50%_20%]"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/70 to-noir/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/75 to-noir/40" />
         <div className="absolute inset-0 bg-noir/20" />
       </motion.div>
 
@@ -41,63 +41,62 @@ export function Hero() {
         variants={container}
         initial="hidden"
         animate="show"
-        className="relative z-10 flex flex-col items-center px-6 text-center"
+        className="relative z-10 flex flex-col items-center px-4 sm:px-6 text-center max-w-4xl mx-auto"
       >
-
-
-        <motion.p
+        {/* Encadrement doré intégrant le surtitre, le titre et la date sans coupure */}
+        <motion.div
           variants={item}
-          className="mt-8 font-body text-xs uppercase tracking-[0.4em] text-or"
+          className="relative border border-or/70 bg-noir/25 backdrop-blur-[2px] px-6 py-4 sm:px-12 sm:py-6 md:px-16 md:py-7 max-w-3xl"
         >
-          TYLA Fashion Week 2026 · Cotonou
-        </motion.p>
+          <p className="font-body text-[10px] sm:text-xs uppercase tracking-[0.35em] sm:tracking-[0.4em] text-or">
+            TYLA Fashion Week 2026 · Cotonou
+          </p>
 
-        <motion.div variants={item} className="relative mt-6">
-          <span className="pointer-events-none absolute -inset-x-8 -inset-y-6 border border-or/70 sm:-inset-x-14 sm:-inset-y-10" />
-          <h1 className="font-display text-[3.2rem] font-semibold leading-[0.95] tracking-tight text-ivoire sm:text-8xl md:text-9xl">
+          <h1 className="mt-2.5 sm:mt-3 font-display text-4xl sm:text-7xl md:text-8xl lg:text-[6.5rem] font-semibold leading-[0.95] tracking-tight text-ivoire">
             J&apos;AFFIRME !
           </h1>
+
+          <p className="mt-2.5 sm:mt-3 font-display text-base sm:text-xl md:text-2xl tracking-[0.2em] text-ivoire">
+            24.10.26
+          </p>
         </motion.div>
 
-        <motion.p
-          variants={item}
-          className="mt-6 font-display text-xl sm:text-2xl tracking-[0.2em] text-ivoire"
-        >
-          24.10.26
-        </motion.p>
-
-        <motion.div variants={item} className="mt-8 w-full">
+        {/* Compte à rebours */}
+        <motion.div variants={item} className="mt-5 sm:mt-6 w-full">
           <Countdown targetDate="2026-10-24T18:30:00" />
         </motion.div>
 
+        {/* Citation manifeste */}
         <motion.p
           variants={item}
-          className="mt-10 max-w-xl text-balance font-body text-sm leading-relaxed text-ivoire/70 sm:text-base"
+          className="mt-4 sm:mt-5 max-w-lg md:max-w-xl text-balance font-body text-xs sm:text-sm md:text-base leading-relaxed text-ivoire/75"
         >
           Créer sans copier. Influencer sans se renier. Transformer son héritage
           en force créative.
         </motion.p>
 
-        <motion.div variants={item} className="mt-10 flex flex-col items-center gap-4 sm:flex-row">
+        {/* Boutons d'action (CTA) */}
+        <motion.div
+          variants={item}
+          className="mt-5 sm:mt-6 flex flex-col items-center gap-3 sm:flex-row sm:gap-5"
+        >
           <a
             href="/billetterie"
-            className="group relative overflow-hidden border border-or px-9 py-3.5 font-body text-xs uppercase tracking-[0.25em] text-or"
+            className="group relative overflow-hidden border border-or px-7 sm:px-9 py-2.5 sm:py-3 font-body text-xs uppercase tracking-[0.22em] sm:tracking-[0.25em] text-or transition-all duration-300 hover:shadow-[0_0_20px_rgba(200,169,126,0.3)]"
           >
             <span className="absolute inset-0 -translate-x-full bg-or transition-transform duration-500 ease-out group-hover:translate-x-0" />
-            <span className="relative transition-colors duration-500 group-hover:text-noir">
+            <span className="relative font-medium transition-colors duration-500 group-hover:text-noir">
               Réserver ma place
             </span>
           </a>
           <a
             href="/evenement"
-            className="font-body text-xs uppercase tracking-[0.25em] text-ivoire/70 transition-colors hover:text-ivoire"
+            className="font-body text-xs uppercase tracking-[0.22em] sm:tracking-[0.25em] text-ivoire/75 transition-colors hover:text-ivoire py-2 px-3"
           >
             Découvrir l&apos;événement
           </a>
         </motion.div>
       </motion.div>
-
-
     </section>
   );
 }
