@@ -1,6 +1,24 @@
 import Image from 'next/image';
-import { Instagram, Facebook } from 'lucide-react';
+import { Instagram, Facebook, Linkedin } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
+
+function TikTokIcon({ size = 20, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+    </svg>
+  );
+}
 
 export function Footer() {
   return (
@@ -66,18 +84,18 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
-                className="font-body text-sm text-ivoire/70 transition-colors hover:text-or flex items-center"
+                className="text-ivoire/70 transition-colors hover:text-or flex items-center"
               >
-                LinkedIn
+                <Linkedin size={20} />
               </a>
               <a
                 href="https://www.tiktok.com/@tylafrica?_r=1&_t=ZN-98xQ86OXW3a"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="TikTok"
-                className="font-body text-sm text-ivoire/70 transition-colors hover:text-or flex items-center"
+                className="text-ivoire/70 transition-colors hover:text-or flex items-center"
               >
-                TikTok
+                <TikTokIcon size={20} />
               </a>
             </div>
           </div>

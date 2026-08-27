@@ -5,14 +5,8 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: "Espace Presse | T.Y.L.A - The Young Leadership Africa",
-  description: "Ressources, communiqués et kit média officiels pour les journalistes et médias.",
+  description: "Ressources et kit média officiels pour les journalistes et médias.",
 };
-
-const RELEASES = [
-  { date: '15 Août 2026', title: 'Lancement de la billetterie J\'AFFIRME Fashion Week 2026', link: '#' },
-  { date: '10 Juin 2026', title: 'Annonce officielle de la programmation de J\'AFFIRME', link: '#' },
-  { date: '05 Janvier 2026', title: 'Ouverture de la branche T.Y.L.A Bénin à Cotonou', link: '#' },
-];
 
 export default function PressePage() {
   return (
@@ -70,36 +64,6 @@ export default function PressePage() {
                 <span className="mt-6 inline-flex font-body text-xs uppercase tracking-wider text-or group-hover:underline">Accéder à la galerie</span>
               </a>
             </Reveal>
-          </div>
-        </div>
-      </section>
-
-      {/* Communiqués de Presse */}
-      <section className="bg-noir py-24 md:py-32">
-        <div className="mx-auto max-w-4xl px-6 md:px-10">
-          <Reveal>
-            <p className="font-body text-xs uppercase tracking-[0.35em] text-or">Actualités</p>
-            <h2 className="mt-5 font-display text-3xl font-semibold text-ivoire sm:text-4xl">
-              Communiqués de Presse
-            </h2>
-          </Reveal>
-          
-          <div className="mt-14 space-y-px border-t border-taupe/30">
-            {RELEASES.map((release, i) => (
-              <Reveal key={i} delay={i * 0.1}>
-                <a href={release.link} className="group flex flex-col justify-between border-b border-taupe/30 py-6 sm:flex-row sm:items-center">
-                  <div>
-                    <p className="font-body text-sm text-or">{release.date}</p>
-                    <p className="mt-1 font-display text-xl font-semibold text-ivoire transition-colors group-hover:text-or">
-                      {release.title}
-                    </p>
-                  </div>
-                  <span className="mt-4 inline-flex items-center gap-2 font-body text-xs uppercase tracking-wider text-ivoire/70 transition-colors group-hover:text-or sm:mt-0">
-                    <FileText size={14} /> Lire le communiqué
-                  </span>
-                </a>
-              </Reveal>
-            ))}
           </div>
         </div>
       </section>

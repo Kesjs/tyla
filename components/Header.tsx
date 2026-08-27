@@ -11,7 +11,6 @@ import { NavLink } from '@/components/NavLink';
 const NAV_LINKS: { href: string; label: string; external?: boolean }[] = [
   { href: '/association', label: "L'Association" },
   { href: '/evenement', label: "L'Événement" },
-  { href: '/billetterie', label: 'Billetterie' },
   { href: '/presse', label: 'Presse' },
   { href: '/contact', label: 'Contact' },
 ];
