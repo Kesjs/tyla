@@ -1,9 +1,10 @@
 'use client';
 
+import { useRef } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Countdown } from './Countdown';
+import { AnimatedText } from '@/components/ui/animated-text';
 
 const container = {
   hidden: {},
@@ -18,11 +19,35 @@ const item = {
 };
 
 export function Hero() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Parallax cinématique fluide synchronisé au scroll
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start'],
+  });
+
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '28%']);
+  const backgroundScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
+  const backgroundOpacity = useTransform(scrollYProgress, [0, 0.8, 1], [1, 0.6, 0.15]);
+
+  const contentY = useTransform(scrollYProgress, [0, 1], ['0%', '-12%']);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.7, 1], [1, 0.7, 0]);
+
   return (
-    <section className="relative flex min-h-[100svh] w-full items-center justify-center overflow-hidden bg-noir pt-20 pb-8 sm:pt-24 sm:pb-10">
+    <section
+      ref={sectionRef}
+      className="relative flex min-h-[100svh] w-full items-center justify-center overflow-hidden bg-noir pt-20 pb-8 sm:pt-24 sm:pb-10"
+    >
+      {/* Plan d'arrière-plan avec Parallax cinématique */}
       <motion.div
-        className="absolute inset-0"
-        initial={{ scale: 1.12, opacity: 0 }}
+        className="absolute inset-0 will-change-transform"
+        style={{
+          y: backgroundY,
+          scale: backgroundScale,
+          opacity: backgroundOpacity,
+        }}
+        initial={{ scale: 1.15, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
       >
@@ -37,11 +62,16 @@ export function Hero() {
         <div className="absolute inset-0 bg-noir/20" />
       </motion.div>
 
+      {/* Plan de contenu au premier plan (Parallax double plan) */}
       <motion.div
         variants={container}
         initial="hidden"
         animate="show"
-        className="relative z-10 flex flex-col items-center px-4 sm:px-6 text-center max-w-4xl mx-auto"
+        style={{
+          y: contentY,
+          opacity: contentOpacity,
+        }}
+        className="relative z-10 flex flex-col items-center px-4 sm:px-6 text-center max-w-4xl mx-auto will-change-transform"
       >
         {/* Encadrement doré intégrant le surtitre, le titre et la date sans coupure */}
         <motion.div
@@ -52,9 +82,15 @@ export function Hero() {
             TYLA Fashion Week 2026 · Cotonou
           </p>
 
-          <h1 className="mt-2.5 sm:mt-3 font-display text-4xl sm:text-7xl md:text-8xl lg:text-[6.5rem] font-semibold leading-[0.95] tracking-tight text-ivoire">
-            J&apos;AFFIRME !
-          </h1>
+          <AnimatedText
+            text="J'AFFIRME !"
+            as="h1"
+            className="mt-2.5 sm:mt-3 font-display text-4xl sm:text-7xl md:text-8xl lg:text-[6.5rem] font-semibold leading-[0.95] tracking-tight text-ivoire"
+            minWeight={400}
+            maxWeight={900}
+            animationDuration={2}
+            delayMultiplier={0.15}
+          />
 
           <p className="mt-2.5 sm:mt-3 font-display text-base sm:text-xl md:text-2xl tracking-[0.2em] text-ivoire">
             24.10.26

@@ -68,6 +68,15 @@ export interface ParallaxGalleryProps {
   subtitle?: string;
 }
 
+function shuffleArray<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 export default function Component({
   images = DEFAULT_GALLERY_IMAGES,
   standalone = false,
@@ -79,6 +88,17 @@ export default function Component({
   const [isReady, setIsReady] = useState(false);
   const loadedCountRef = useRef(0);
 
+  const baseList = useMemo(() => {
+    return images && images.length > 0 ? images : DEFAULT_GALLERY_IMAGES;
+  }, [images]);
+
+  // Mélange aléatoire (Shuffle) des photos choisies à chaque chargement/rechargement
+  const [shuffledList, setShuffledList] = useState<string[]>(baseList);
+
+  useEffect(() => {
+    setShuffledList(shuffleArray(baseList));
+  }, [baseList]);
+
   const handleItemLoad = useCallback(() => {
     loadedCountRef.current += 1;
     if (!isReady && loadedCountRef.current >= 1) setIsReady(true);
@@ -89,23 +109,32 @@ export default function Component({
     return () => clearTimeout(t);
   }, []);
 
-  const imageList = useMemo(() => {
-    return images && images.length > 0 ? images : DEFAULT_GALLERY_IMAGES;
-  }, [images]);
-
   const colMedia = useMemo(() => {
-    const col1Base = imageList.filter((_, i) => i % 4 === 0);
-    const col2Base = imageList.filter((_, i) => i % 4 === 1);
-    const col3Base = imageList.filter((_, i) => i % 4 === 2);
-    const col4Base = imageList.filter((_, i) => i % 4 === 3);
+    const list = shuffledList;
+    const count = list.length;
+    if (count === 0) return { col1: [], col2: [], col3: [], col4: [] };
+
+    // Partition stricte : chaque image apparaît UNE SEULE FOIS dans TOUTE la galerie (zéro doublon)
+    const col1: string[] = [];
+    const col2: string[] = [];
+    const col3: string[] = [];
+    const col4: string[] = [];
+
+    list.forEach((img, index) => {
+      const colIndex = index % 4;
+      if (colIndex === 0) col1.push(img);
+      else if (colIndex === 1) col2.push(img);
+      else if (colIndex === 2) col3.push(img);
+      else col4.push(img);
+    });
 
     return {
-      col1: [...col1Base, ...col1Base, ...col1Base],
-      col2: [...col2Base, ...col2Base, ...col2Base],
-      col3: [...col3Base, ...col3Base, ...col3Base],
-      col4: [...col4Base, ...col4Base, ...col4Base],
+      col1,
+      col2,
+      col3,
+      col4,
     };
-  }, [imageList]);
+  }, [shuffledList]);
 
   // LINKED SCROLL: tracks scroll container if standalone, or tracks page scroll if embedded in site
   const { scrollYProgress } = useScroll({
@@ -132,11 +161,11 @@ export default function Component({
   const rotateZ = useTransform(smoothProgress, [0, 0.15, 1], [12, 12, 0]);
   const translateZ = useTransform(smoothProgress, [0, 0.15, 1], [-700, -700, 0]);
 
-  // Track columns parallax animations
-  const yCol1 = useTransform(smoothProgress, [0, 0.15, 1], ["0%", "0%", "-40%"]);
-  const yCol2 = useTransform(smoothProgress, [0, 0.15, 1], ["-35%", "-35%", "10%"]);
-  const yCol3 = useTransform(smoothProgress, [0, 0.15, 1], ["0%", "0%", "-40%"]);
-  const yCol4 = useTransform(smoothProgress, [0, 0.15, 1], ["-25%", "-25%", "20%"]);
+  // Track columns parallax animations (ajustés pour les 3 cartes par colonne sans doublon)
+  const yCol1 = useTransform(smoothProgress, [0, 0.15, 1], ["0%", "0%", "-22%"]);
+  const yCol2 = useTransform(smoothProgress, [0, 0.15, 1], ["-18%", "-18%", "8%"]);
+  const yCol3 = useTransform(smoothProgress, [0, 0.15, 1], ["0%", "0%", "-22%"]);
+  const yCol4 = useTransform(smoothProgress, [0, 0.15, 1], ["-14%", "-14%", "12%"]);
 
   // Header fade-out on deep scroll
   const headerOpacity = useTransform(smoothProgress, [0, 0.12, 0.3], [1, 0.9, 0]);
