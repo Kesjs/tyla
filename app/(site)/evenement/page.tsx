@@ -67,13 +67,13 @@ export default function EvenementPage() {
                 Un contraste saisissant entre la profondeur des racines africaines et le minimalisme contemporain international.
                 « J&apos;AFFIRME ! » part d&apos;un constat simple : l&apos;Afrique et sa jeunesse créative n&apos;ont plus à se justifier, mais à s&apos;exprimer et
                 assumer leur place. Longtemps jugée secondaire, la mode africaine a pourtant influencé la mode mondiale, du corporate au
-                streetwear, de l’élégance classique aux esthétiques contemporaines. « J’AFFIRME ! » est une réponse à cette invisibilisation.
+                streetwear, de l'élégance classique aux esthétiques contemporaines. « J'AFFIRME ! » est une réponse à cette invisibilisation.
               </p>
             </Reveal>
             <Reveal delay={0.25}>
               <p className="mt-4 font-body text-[15px] leading-relaxed text-taupe">
                 Ce thème est un acte de reconnaissance et de projection : reconnaître ses racines, créer sans copier, influencer sans se renier. 
-                Le concept affirme une Afrique authentique et audacieuse, qui avance avec confiance. Plus qu&apos;un événement, c’est un manifeste.
+                Le concept affirme une Afrique authentique et audacieuse, qui avance avec confiance. Plus qu&apos;un événement, c'est un manifeste.
               </p>
             </Reveal>
           </div>
@@ -89,7 +89,7 @@ export default function EvenementPage() {
               Une semaine, un défilé
             </h2>
             <p className="mx-auto mt-6 max-w-2xl font-body text-[15px] leading-relaxed text-ivoire/70">
-              Découvrez les 5 designers sélectionnés avec leur collection, à travers un programme détaillé
+              Découvrez les designers sélectionnés avec leur collection, à travers un programme détaillé
               du 20 au 24 octobre, incluant 3 workshops ouverts au public.
             </p>
           </Reveal>
@@ -105,7 +105,7 @@ export default function EvenementPage() {
                 </div>
               </Reveal>
             ))}
-            <div className="border-t border-taupe" />
+            <div className="border-t border-taupe pt-0" />
           </div>
         </div>
       </section>
