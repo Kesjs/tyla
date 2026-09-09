@@ -28,18 +28,18 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     orderId = body.orderId;
-    reference = body.reference;
+    reference = body.reference || null;
 
-    if (!orderId || !reference) {
-      return NextResponse.json({ error: 'Paramètres manquants (orderId, reference).' }, { status: 400 });
+    if (!orderId) {
+      return NextResponse.json({ error: 'Paramètre manquant (orderId).' }, { status: 400 });
     }
 
     // Validation basique des IDs pour éviter l'injection
     if (typeof orderId !== 'string' || orderId.length > 50) {
       return NextResponse.json({ error: 'ID de commande invalide.' }, { status: 400 });
     }
-    
-    if (typeof reference !== 'string' || reference.length > 100) {
+
+    if (reference !== null && (typeof reference !== 'string' || reference.length > 100)) {
       return NextResponse.json({ error: 'Référence GeniusPay invalide.' }, { status: 400 });
     }
 
@@ -53,6 +53,17 @@ export async function POST(req: NextRequest) {
 
     if (orderError || !order) {
       return NextResponse.json({ error: 'Commande introuvable.' }, { status: 404 });
+    }
+
+    // Si le callback n'a pas transmis de référence (selon comment GeniusPay
+    // gère le retour), on se rabat sur celle enregistrée en base au moment
+    // de l'initiation du paiement (voir /api/geniuspay/initiate).
+    if (!reference) {
+      reference = order.payment_transaction_id;
+    }
+
+    if (!reference) {
+      return NextResponse.json({ error: 'Référence de paiement introuvable pour cette commande.' }, { status: 400 });
     }
 
     // Commande déjà confirmée (évite les doubles générations de billets)
@@ -75,14 +86,17 @@ export async function POST(req: NextRequest) {
     // Vérification du statut du paiement
     // Status peut être: 'pending', 'processing', 'completed', 'failed', 'cancelled', 'refunded'
     if (verification.data?.status !== 'completed') {
-      await supabase
+      const { error: failUpdateError } = await supabase
         .from('tyla_orders')
         .update({ 
           status: 'failed', 
-          payment_reference: reference, 
+          payment_transaction_id: reference, 
           payment_raw_response: verification 
         })
         .eq('id', orderId);
+      if (failUpdateError) {
+        console.error('[confirm-payment] Failed to mark order as failed:', failUpdateError);
+      }
       return NextResponse.json({ error: 'Le paiement n\'a pas été confirmé.' }, { status: 402 });
     }
 
@@ -97,14 +111,19 @@ export async function POST(req: NextRequest) {
     }
 
     // Paiement confirmé : on marque la commande payée
-    await supabase
+    const { error: paidUpdateError } = await supabase
       .from('tyla_orders')
       .update({
         status: 'paid',
-        payment_reference: reference,
+        payment_transaction_id: reference,
         payment_raw_response: verification,
       })
       .eq('id', orderId);
+
+    if (paidUpdateError) {
+      console.error('[confirm-payment] Failed to mark order as paid:', paidUpdateError);
+      return NextResponse.json({ error: 'Paiement vérifié mais échec de mise à jour de la commande — contactez benin@tylafrica.com.' }, { status: 500 });
+    }
 
     // Récupère le préfixe de la catégorie pour formater les codes
     const { data: cat } = await supabase
