@@ -68,11 +68,14 @@ export default function RetrouverBilletsPage() {
               <input
                 required
                 type="tel"
-                placeholder="97 12 34 56"
+                placeholder="ex: +33 6 12 34 56 78 ou +229 97 12 34 56"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 className="mt-2 w-full border-b border-taupe bg-transparent py-2.5 font-body text-ivoire outline-none focus:border-or"
               />
+              <p className="mt-1.5 font-body text-[11px] text-ivoire/40">
+                Avec ou sans l&apos;indicatif pays, peu importe — on retrouve votre billet dans les deux cas.
+              </p>
             </div>
 
             {error && <p className="font-body text-sm text-porto-light">{error}</p>}
