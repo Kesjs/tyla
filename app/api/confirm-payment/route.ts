@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyGeniusPayTransaction, formatTicketCode } from '@/lib/geniuspay';
+import { generateQrSecret } from '@/lib/qr-secret';
 import { SecurityLogger } from '@/lib/security';
 import { rateLimiter, RATE_LIMITS, getClientIP } from '@/lib/rate-limit';
 import { handleCORSOptions, applyCORS } from '@/lib/cors';
@@ -155,6 +156,7 @@ export async function POST(req: NextRequest) {
         category_id: order.category_id,
         ticket_number: ticketNumber,
         ticket_code: formatTicketCode(cat.code_prefix, ticketNumber),
+        qr_secret: generateQrSecret(),
         buyer_name: order.buyer_name,
         buyer_email: order.buyer_email,
       };
