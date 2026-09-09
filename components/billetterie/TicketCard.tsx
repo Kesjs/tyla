@@ -12,25 +12,31 @@ import { NavLink } from '@/components/NavLink';
 // ============================================================================
 export function TicketCard({
   ticketCode,
+  qrSecret,
   categoryName,
   buyerName,
 }: {
   ticketCode: string;
+  /** Secret aléatoire encodé dans le QR (source de vérité au check-in).
+   * Fallback sur ticketCode uniquement pour d'éventuels vieux billets
+   * générés avant la migration qr_secret. */
+  qrSecret?: string | null;
   categoryName: string;
   buyerName: string;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [downloading, setDownloading] = useState(false);
+  const qrValue = qrSecret || ticketCode;
 
   useEffect(() => {
     if (canvasRef.current) {
-      QRCode.toCanvas(canvasRef.current, ticketCode, {
-        width: 220,
-        margin: 1,
+      QRCode.toCanvas(canvasRef.current, qrValue, {
+        width: 300,
+        margin: 2,
         color: { dark: '#0A0A0A', light: '#F5F0E8' },
       });
     }
-  }, [ticketCode]);
+  }, [qrValue]);
 
   async function downloadPdf() {
     if (!canvasRef.current) return;
@@ -101,6 +107,7 @@ export function TicketCard({
 interface TicketData {
   id: string;
   ticketCode: string;
+  qrSecret?: string | null;
   categoryName: string;
   buyerName: string;
 }
@@ -110,13 +117,14 @@ export function ConfirmationContent({ tickets }: { tickets: TicketData[] }) {
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [downloadingAll, setDownloadingAll] = useState(false);
 
-  // Générer les QR codes
+  // Générer les QR codes (le secret aléatoire est la source de vérité,
+  // pas le ticket_code lisible/séquentiel)
   useEffect(() => {
     tickets.forEach((ticket) => {
       if (canvasRefs.current[ticket.id]) {
-        QRCode.toCanvas(canvasRefs.current[ticket.id], ticket.ticketCode, {
-          width: 220,
-          margin: 1,
+        QRCode.toCanvas(canvasRefs.current[ticket.id], ticket.qrSecret || ticket.ticketCode, {
+          width: 300,
+          margin: 2,
           color: { dark: '#0A0A0A', light: '#F5F0E8' },
         });
       }
