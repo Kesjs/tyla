@@ -93,6 +93,21 @@ export async function POST(req: NextRequest) {
     const checkoutUrl = geniuspayResponse.data?.checkout_url || geniuspayResponse.data?.payment_url;
     console.log('[API] Final checkout URL:', checkoutUrl);
 
+    // On enregistre la référence GeniusPay dès maintenant, avant même que le
+    // client parte payer. Sans ça, /billetterie/confirmation dépend
+    // entièrement de ce qui revient (ou pas) dans l'URL de callback — et si
+    // GeniusPay ne renvoie pas la référence comme attendu, le paiement se
+    // confirme quand même côté GeniusPay mais la commande reste bloquée en
+    // "pending" chez nous, sans aucun billet généré.
+    if (geniuspayResponse.data?.reference) {
+      const { createAdminClient } = await import('@/lib/supabase/admin');
+      const supabase = createAdminClient();
+      await supabase
+        .from('tyla_orders')
+        .update({ payment_transaction_id: geniuspayResponse.data.reference })
+        .eq('id', orderId);
+    }
+
     const response = NextResponse.json({
       success: true,
       checkoutUrl: checkoutUrl,
