@@ -11,7 +11,7 @@ function checkLoginRateLimit(ip: string): boolean {
   const maxAttempts = 5;
 
   const attempts = loginAttempts.get(ip);
-
+  
   if (!attempts || attempts.resetTime < now) {
     loginAttempts.set(ip, { count: 1, resetTime: now + windowMs });
     return true;
@@ -49,23 +49,29 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   const isLoginPage = request.nextUrl.pathname === '/admin/login';
+  const isResetPasswordPage = request.nextUrl.pathname === '/admin/reset-password';
+  // Pages accessibles sans session admin déjà établie : login classique et
+  // la page de définition de mot de passe (utilisée via le lien de
+  // récupération envoyé par email, où la session ne se forme que côté
+  // client une fois la page chargée).
+  const isPublicAuthPage = isLoginPage || isResetPasswordPage;
 
   // Rate limiting pour login admin
   if (isLoginPage && request.method === 'POST') {
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
-              request.headers.get('x-real-ip') ||
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
+              request.headers.get('x-real-ip') || 
               'unknown';
-
+    
     if (!checkLoginRateLimit(ip)) {
-      SecurityLogger.logSuspiciousActivity('login_rate_limit', ip, {
+      SecurityLogger.logSuspiciousActivity('login_rate_limit', ip, { 
         endpoint: 'admin/login',
-        attempts: loginAttempts.get(ip)?.count
+        attempts: loginAttempts.get(ip)?.count 
       });
       return NextResponse.redirect(new URL('/admin/login?blocked=true', request.url));
     }
   }
 
-  if (!user && !isLoginPage) {
+  if (!user && !isPublicAuthPage) {
     const url = request.nextUrl.clone();
     url.pathname = '/admin/login';
     return NextResponse.redirect(url);
@@ -86,7 +92,7 @@ export async function middleware(request: NextRequest) {
       profile?.role === 'admin' ||
       (Array.isArray(profile?.account_roles) && profile.account_roles.includes('admin'));
 
-    if (!isAdmin && !isLoginPage) {
+    if (!isAdmin && !isPublicAuthPage) {
       const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
                 request.headers.get('x-real-ip') ||
                 'unknown';
