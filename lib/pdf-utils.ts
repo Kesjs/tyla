@@ -32,28 +32,28 @@ export async function generateTicketPdf(
   doc.setLineWidth(0.4);
   doc.rect(5, 31, 90, 114);
 
-  // QR code centré
-  const qrSize = 55;
-  doc.addImage(qrDataUrl, 'PNG', (100 - qrSize) / 2, 38, qrSize, qrSize);
+  // QR code centré (agrandi pour un scan plus rapide/fiable le jour J)
+  const qrSize = 65;
+  doc.addImage(qrDataUrl, 'PNG', (100 - qrSize) / 2, 36, qrSize, qrSize);
 
   // Code du billet
   doc.setTextColor(noir);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(13);
-  doc.text(ticketCode, 50, 102, { align: 'center' });
+  doc.text(ticketCode, 50, 108, { align: 'center' });
 
   // Nom de l'acheteur
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   doc.setTextColor(taupe);
-  doc.text(buyerName, 50, 110, { align: 'center' });
+  doc.text(buyerName, 50, 116, { align: 'center' });
 
   // Infos événement
   doc.setFontSize(8);
-  doc.text('24 OCTOBRE 2026 · FAMILY BEACH, COTONOU', 50, 128, { align: 'center' });
+  doc.text('24 OCTOBRE 2026 · FAMILY BEACH, COTONOU', 50, 132, { align: 'center' });
   doc.setFontSize(7);
   doc.setTextColor('#8a8378');
-  doc.text('T.Y.L.A — The Young Leadership Africa', 50, 138, { align: 'center' });
+  doc.text('T.Y.L.A — The Young Leadership Africa', 50, 140, { align: 'center' });
 
   return doc.output('blob');
 }
