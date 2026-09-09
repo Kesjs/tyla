@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
       // Recherche la commande par ID
       const { data: order, error: orderError } = await supabase
         .from('tyla_orders')
-        .select('*, tyla_ticket_categories(name, ticket_code_prefix)')
+        .select('*, tyla_ticket_categories(name, code_prefix, sold_count)')
         .eq('id', orderId)
         .single();
 
@@ -89,38 +89,33 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: true, message: 'Already processed' });
       }
 
-      // Récupérer les prochains numéros de tickets pour cette catégorie
-      const { data: lastTickets, error: lastError } = await supabase
-        .from('tyla_tickets')
-        .select('ticket_number')
-        .eq('category_id', order.category_id)
-        .order('ticket_number', { ascending: false })
-        .limit(1);
+      // Réserve atomiquement un bloc de N numéros consécutifs dans le segment
+      // de cette catégorie (même fonction que /api/confirm-payment, pour
+      // éviter toute collision entre commandes simultanées)
+      const prefix = (order.tyla_ticket_categories?.code_prefix as string) || 'JAF';
+      const { data: startNumber, error: reserveError } = await supabase.rpc(
+        'tyla_reserve_ticket_numbers',
+        { p_category_id: order.category_id, p_count: order.quantity }
+      );
 
-      let nextTicketNumber = 1;
-      if (!lastError && lastTickets && lastTickets.length > 0) {
-        nextTicketNumber = (lastTickets[0].ticket_number as number) + 1;
+      if (reserveError || startNumber === null) {
+        console.error('[Webhook] Failed to reserve ticket numbers:', reserveError);
+        SecurityLogger.log('webhook_tickets_creation_failed', { orderId, error: reserveError?.message });
+        return NextResponse.json({ error: 'Erreur lors de la génération des billets' }, { status: 500 });
       }
 
-      // Créer les billets pour cette commande
-      const tickets = [];
-      const prefix = (order.tyla_ticket_categories?.ticket_code_prefix as string) || 'GEN';
-      
-      for (let i = 0; i < order.quantity; i++) {
-        const ticketNumber = nextTicketNumber + i;
-        const ticketCode = formatTicketCode(prefix, ticketNumber);
-        
-        tickets.push({
+      // Créer les billets pour cette commande (mêmes colonnes réelles que confirm-payment)
+      const tickets = Array.from({ length: order.quantity }).map((_, i) => {
+        const ticketNumber = (startNumber as number) + i;
+        return {
           order_id: orderId,
           category_id: order.category_id,
-          ticket_code: ticketCode,
           ticket_number: ticketNumber,
+          ticket_code: formatTicketCode(prefix, ticketNumber),
           buyer_name: order.buyer_name,
-          qr_code_data: ticketCode, // Le QR code contient le code du billet
-          status: 'valid',
-          checked_in: false,
-        });
-      }
+          buyer_email: order.buyer_email,
+        };
+      });
 
       // Insérer les billets en base de données
       const { error: insertError } = await supabase
@@ -133,6 +128,13 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Erreur lors de la création des billets' }, { status: 500 });
       }
 
+      // Incrémente le compteur de billets vendus sur la catégorie
+      const currentSoldCount = (order.tyla_ticket_categories as { sold_count?: number })?.sold_count ?? 0;
+      await supabase
+        .from('tyla_ticket_categories')
+        .update({ sold_count: currentSoldCount + order.quantity })
+        .eq('id', order.category_id);
+
       console.log('[Webhook] Tickets created:', { orderId, ticketCount: tickets.length });
 
       // Mettre à jour le statut de la commande
@@ -140,9 +142,8 @@ export async function POST(req: NextRequest) {
         .from('tyla_orders')
         .update({
           status: 'paid',
-          payment_reference: reference,
+          payment_transaction_id: reference,
           payment_raw_response: payload,
-          paid_at: new Date().toISOString(),
         })
         .eq('id', order.id);
 
@@ -172,7 +173,7 @@ export async function POST(req: NextRequest) {
           .from('tyla_orders')
           .update({ 
             status: 'failed',
-            payment_reference: reference,
+            payment_transaction_id: reference,
             payment_raw_response: payload,
           })
           .eq('id', order.id);
@@ -192,7 +193,7 @@ export async function POST(req: NextRequest) {
           .from('tyla_orders')
           .update({
             status: 'cancelled',
-            payment_reference: reference,
+            payment_transaction_id: reference,
             payment_raw_response: payload,
           })
           .eq('id', order.id);
