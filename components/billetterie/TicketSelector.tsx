@@ -181,13 +181,12 @@ export function TicketSelector({ categories, paymentCancelled }: { categories: T
       console.log('[TicketSelector] Available keys:', Object.keys(data));
       
       // Redirection vers le checkout GeniusPay hébergé
+      // (l'orderId n'a pas besoin d'être ajouté ici : il est déjà encodé
+      // côté serveur dans le success_url/error_url envoyé à GeniusPay,
+      // voir lib/geniuspay.ts)
       if (data.checkoutUrl) {
         console.log('[TicketSelector] Redirecting to:', data.checkoutUrl);
-        // Ajouter les paramètres de callback avec l'orderId pour gérer l'annulation
-        const callbackUrl = data.checkoutUrl.includes('?')
-          ? `${data.checkoutUrl}&order=${orderId}`
-          : `${data.checkoutUrl}?order=${orderId}`;
-        window.location.href = callbackUrl;
+        window.location.href = data.checkoutUrl;
       } else {
         console.error('[TicketSelector] No checkout URL found. Available:', data);
         setErrorMsg('Impossible de récupérer le lien de paiement. Réponse: ' + JSON.stringify(data));
