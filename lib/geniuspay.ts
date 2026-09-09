@@ -97,14 +97,19 @@ export async function initiateGeniusPayPayment(params: {
     };
   }
 
+  // L'orderId est indispensable dans les URLs de retour : c'est lui qui
+  // permet à la page de callback de savoir quelle commande confirmer.
+  const orderId = metadata?.order_id as string | undefined;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
   // Construire le payload pour l'API GeniusPay
   const payload: Record<string, unknown> = {
     amount,
     description,
     currency: 'XOF',
     // Omettez payment_method pour afficher la page de checkout GeniusPay
-    success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/billetterie/geniuspay-callback?status=success&reference=`,
-    error_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/billetterie/geniuspay-callback?status=error`,
+    success_url: `${baseUrl}/billetterie/geniuspay-callback?status=success&order=${orderId ?? ''}&reference=`,
+    error_url: `${baseUrl}/billetterie/geniuspay-callback?status=error&order=${orderId ?? ''}`,
   };
 
   // Ajouter les infos client si disponibles
