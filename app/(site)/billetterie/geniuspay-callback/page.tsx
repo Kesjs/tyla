@@ -24,20 +24,23 @@ function GeniusPayCallbackContent() {
           return;
         }
 
-        // Si le paiement a été annulé, rediriger vers la billetterie
-        if (paymentStatus === 'error' || !reference || paymentStatus !== 'success') {
-          // Rediriger immédiatement vers la billetterie avec un message d'erreur
+        // Si GeniusPay indique explicitement une erreur/annulation, on arrête
+        if (paymentStatus === 'error') {
           setTimeout(() => {
             router.push('/billetterie?payment=cancelled');
           }, 500);
           return;
         }
 
-        // Confirmer le paiement auprès du serveur
+        // Note: on ne bloque plus sur l'absence de `reference` dans l'URL.
+        // Certaines intégrations GeniusPay ne renvoient pas la référence
+        // dans le callback ; /api/confirm-payment sait retrouver la
+        // référence enregistrée en base au moment de l'initiation du
+        // paiement si elle n'est pas fournie ici.
         const response = await fetch('/api/confirm-payment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ orderId, reference }),
+          body: JSON.stringify({ orderId, reference: reference || undefined }),
         });
 
         if (response.ok) {
