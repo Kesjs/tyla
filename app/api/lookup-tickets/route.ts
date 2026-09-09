@@ -63,7 +63,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       tickets: (tickets ?? []).map((t: any) => ({
+        id: t.id,
         ticketCode: t.ticket_code,
+        qrSecret: t.qr_secret,
         categoryName: t.tyla_ticket_categories?.name ?? '',
         buyerName: t.buyer_name,
       })),
