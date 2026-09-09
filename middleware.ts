@@ -11,7 +11,7 @@ function checkLoginRateLimit(ip: string): boolean {
   const maxAttempts = 5;
 
   const attempts = loginAttempts.get(ip);
-  
+
   if (!attempts || attempts.resetTime < now) {
     loginAttempts.set(ip, { count: 1, resetTime: now + windowMs });
     return true;
@@ -52,14 +52,14 @@ export async function middleware(request: NextRequest) {
 
   // Rate limiting pour login admin
   if (isLoginPage && request.method === 'POST') {
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
-              request.headers.get('x-real-ip') || 
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
+              request.headers.get('x-real-ip') ||
               'unknown';
-    
+
     if (!checkLoginRateLimit(ip)) {
-      SecurityLogger.logSuspiciousActivity('login_rate_limit', ip, { 
+      SecurityLogger.logSuspiciousActivity('login_rate_limit', ip, {
         endpoint: 'admin/login',
-        attempts: loginAttempts.get(ip)?.count 
+        attempts: loginAttempts.get(ip)?.count
       });
       return NextResponse.redirect(new URL('/admin/login?blocked=true', request.url));
     }
@@ -71,7 +71,37 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && isLoginPage) {
+  // Vérification du rôle admin réel (table partagée Ayiba public.users).
+  // Un compte connecté (client/vendeur/livreur, y compris ceux d'Ayiba) ne
+  // doit PAS pouvoir accéder à /admin/* juste parce qu'il est authentifié.
+  let isAdmin = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from('users')
+      .select('role, account_roles')
+      .eq('id', user.id)
+      .single();
+
+    isAdmin =
+      profile?.role === 'admin' ||
+      (Array.isArray(profile?.account_roles) && profile.account_roles.includes('admin'));
+
+    if (!isAdmin && !isLoginPage) {
+      const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
+                request.headers.get('x-real-ip') ||
+                'unknown';
+      SecurityLogger.logSuspiciousActivity('admin_access_denied', ip, {
+        endpoint: request.nextUrl.pathname,
+        userId: user.id,
+      });
+      const url = request.nextUrl.clone();
+      url.pathname = '/admin/login';
+      url.searchParams.set('unauthorized', 'true');
+      return NextResponse.redirect(url);
+    }
+  }
+
+  if (user && isAdmin && isLoginPage) {
     const url = request.nextUrl.clone();
     url.pathname = '/admin';
     return NextResponse.redirect(url);
