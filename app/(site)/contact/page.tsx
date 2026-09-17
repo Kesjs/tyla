@@ -19,7 +19,7 @@ const DEFAULT_COMMITTEE: CommitteeMember[] = [
     initials: 'TM', 
     name: 'Tatiana Monteiro', 
     role: 'Présidente',
-    email: 'presidente@tylafrica.com',
+    email: 'tatiana@tylafrica.com',
     phone: '',
     display_order: 1,
     active: true
@@ -28,7 +28,7 @@ const DEFAULT_COMMITTEE: CommitteeMember[] = [
     initials: 'MT', 
     name: 'Myriam Tsumbu Nzanzala', 
     role: 'Vice-Présidente',
-    email: 'vice-presidente@tylafrica.com',
+    email: 'myriam@tylafrica.com',
     phone: '',
     display_order: 2,
     active: true
@@ -38,7 +38,7 @@ const DEFAULT_COMMITTEE: CommitteeMember[] = [
     initials: 'ET', 
     name: 'Eunice Tchibozo', 
     role: 'Resp. Projet et Développement',
-    email: 'projet@tylafrica.com',
+    email: 'eunice@tylafrica.com',
     phone: '',
     display_order: 4,
     active: true
@@ -47,9 +47,18 @@ const DEFAULT_COMMITTEE: CommitteeMember[] = [
     initials: 'BO', 
     name: 'Benedicte Okonda', 
     role: 'Secrétaire Générale',
-    email: 'secretaire@tylafrica.com',
+    email: 'info@tylafrica.com',
     phone: '',
     display_order: 5,
+    active: true
+  },
+  { 
+    initials: 'TB', 
+    name: 'T.Y.L.A Bénin', 
+    role: 'Antenne Bénin',
+    email: 'benin@tylafrica.com',
+    phone: '',
+    display_order: 6,
     active: true
   },
   { 
@@ -58,7 +67,7 @@ const DEFAULT_COMMITTEE: CommitteeMember[] = [
     role: 'Responsable Média',
     email: 'info@tylafrica.com',
     phone: '',
-    display_order: 6,
+    display_order: 7,
     active: true
   },
 ];
