@@ -68,6 +68,22 @@ export default async function BilletteriePage({
             Déjà payé ? Retrouver mes billets
           </a>
         </Reveal>
+
+        <Reveal delay={0.1}>
+          <div className="mx-auto mt-10 max-w-lg border border-or/30 bg-or/5 px-6 py-6">
+            <p className="font-body text-sm text-ivoire/70">
+              Vous souhaitez soutenir le mouvement T.Y.L.A sans acheter de billet ?
+            </p>
+            <a
+              href="https://donate.raisenow.io/kcbgx?lng=fr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-block border border-or bg-or px-8 py-3 font-body text-xs uppercase tracking-[0.25em] text-noir transition-opacity hover:opacity-90"
+            >
+              Faire un don
+            </a>
+          </div>
+        </Reveal>
       </div>
 
       <div className="mx-auto mt-16 max-w-5xl px-6 md:px-10">
