@@ -99,7 +99,7 @@ export default async function ContactPage() {
             Parlons-en.
           </h1>
           <p className="mt-5 max-w-sm font-body text-sm leading-relaxed text-ivoire/60">
-            Restez informés sur l&apos;événement ou devenez partenaire.
+            Restez informés sur l&apos;événement!.
           </p>
         </Reveal>
 
