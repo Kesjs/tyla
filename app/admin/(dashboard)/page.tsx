@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { formatFcfa, placesRemaining, type TicketCategory } from '@/lib/tickets';
 import { TrendingUp, Ticket, Users, Wallet, RefreshCw } from 'lucide-react';
-import PaymentReconciliation from '@/components/admin/PaymentReconciliation';
+import { PaymentReconciliation } from '@/components/admin/PaymentReconciliation';
 
 export const revalidate = 0;
 
