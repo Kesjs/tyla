@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { verifyGeniusPayTransaction, formatTicketCode } from '@/lib/geniuspay';
-import { generateQrSecret } from '@/lib/qr-secret';
+import { verifyGeniusPayTransaction } from '@/lib/geniuspay';
+import { confirmOrderPaid, markOrderNotPaid } from '@/lib/payment-confirmation';
 import { SecurityLogger } from '@/lib/security';
 import { rateLimiter, RATE_LIMITS, getClientIP } from '@/lib/rate-limit';
 import { handleCORSOptions, applyCORS } from '@/lib/cors';
@@ -87,17 +87,7 @@ export async function POST(req: NextRequest) {
     // Vérification du statut du paiement
     // Status peut être: 'pending', 'processing', 'completed', 'failed', 'cancelled', 'refunded'
     if (verification.data?.status !== 'completed') {
-      const { error: failUpdateError } = await supabase
-        .from('tyla_orders')
-        .update({ 
-          status: 'failed', 
-          payment_transaction_id: reference, 
-          payment_raw_response: verification 
-        })
-        .eq('id', orderId);
-      if (failUpdateError) {
-        console.error('[confirm-payment] Failed to mark order as failed:', failUpdateError);
-      }
+      await markOrderNotPaid(supabase, orderId, 'failed', reference, verification, 'callback');
       return NextResponse.json({ error: 'Le paiement n\'a pas été confirmé.' }, { status: 402 });
     }
 
@@ -111,76 +101,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Montant de paiement incohérent.' }, { status: 402 });
     }
 
-    // Paiement confirmé : on marque la commande payée
-    const { error: paidUpdateError } = await supabase
-      .from('tyla_orders')
-      .update({
-        status: 'paid',
-        payment_transaction_id: reference,
-        payment_raw_response: verification,
-      })
-      .eq('id', orderId);
+    // Paiement confirmé : logique unique de confirmation partagée avec le
+    // webhook et le réconciliateur (voir lib/payment-confirmation.ts)
+    const result = await confirmOrderPaid(supabase, orderId, reference, verification, 'callback');
 
-    if (paidUpdateError) {
-      console.error('[confirm-payment] Failed to mark order as paid:', paidUpdateError);
-      return NextResponse.json({ error: 'Paiement vérifié mais échec de mise à jour de la commande — contactez benin@tylafrica.com.' }, { status: 500 });
+    if (result.outcome === 'error') {
+      return NextResponse.json(
+        { error: `${result.error} Contactez benin@tylafrica.com.` },
+        { status: 500 }
+      );
     }
-
-    // Récupère le préfixe de la catégorie pour formater les codes
-    const { data: cat } = await supabase
-      .from('tyla_ticket_categories')
-      .select('code_prefix, sold_count')
-      .eq('id', order.category_id)
-      .single();
-
-    if (!cat) {
-      return NextResponse.json({ error: 'Catégorie de billet introuvable.' }, { status: 500 });
-    }
-
-    // Réserve atomiquement un bloc de N numéros consécutifs dans le segment
-    // de cette catégorie (évite toute collision entre commandes simultanées)
-    const { data: startNumber, error: reserveError } = await supabase.rpc(
-      'tyla_reserve_ticket_numbers',
-      { p_category_id: order.category_id, p_count: order.quantity }
-    );
-
-    if (reserveError || startNumber === null) {
-      return NextResponse.json({ error: 'Paiement confirmé mais erreur lors de la génération des billets — contactez benin@tylafrica.com.' }, { status: 500 });
-    }
-
-    // Génération d'un billet par place achetée, avec numéro séquentiel dans le segment réservé
-    const ticketsToInsert = Array.from({ length: order.quantity }).map((_, i) => {
-      const ticketNumber = startNumber + i;
-      return {
-        order_id: order.id,
-        category_id: order.category_id,
-        ticket_number: ticketNumber,
-        ticket_code: formatTicketCode(cat.code_prefix, ticketNumber),
-        qr_secret: generateQrSecret(),
-        buyer_name: order.buyer_name,
-        buyer_email: order.buyer_email,
-      };
-    });
-
-    const { data: tickets, error: ticketsError } = await supabase
-      .from('tyla_tickets')
-      .insert(ticketsToInsert)
-      .select();
-
-    if (ticketsError) {
-      return NextResponse.json({ error: 'Paiement confirmé mais erreur lors de la génération des billets — contactez benin@tylafrica.com.' }, { status: 500 });
-    }
-
-    // Incrémente le compteur de billets vendus sur la catégorie
-    await supabase
-      .from('tyla_ticket_categories')
-      .update({ sold_count: cat.sold_count + order.quantity })
-      .eq('id', order.category_id);
 
     SecurityLogger.logApiCall('confirm-payment', 'POST', ip, true);
-    SecurityLogger.log('payment_confirmed', { orderId, reference, amount: order.total_amount });
 
-    const response = NextResponse.json({ tickets });
+    const response = NextResponse.json({ tickets: result.tickets ?? [] });
     return applyCORS(response);
   } catch (err) {
     SecurityLogger.log('confirm_payment_error', { 
