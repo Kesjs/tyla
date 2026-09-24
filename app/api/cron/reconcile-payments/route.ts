@@ -25,6 +25,7 @@ import { SecurityLogger } from '@/lib/security';
  */
 
 const PENDING_MAX_AGE_MINUTES = 15;
+const AUTO_CANCEL_MINUTES = 3; // Annuler automatiquement après 3 minutes si toujours pending
 const MAX_ORDERS_PER_RUN = 50;
 
 function isAuthorized(req: NextRequest): boolean {
@@ -64,11 +65,15 @@ export async function GET(req: NextRequest) {
     confirmed: [] as string[],
     failed: [] as string[],
     stillPending: [] as string[],
+    autoCancelled: [] as string[],
     errors: [] as { orderId: string; error: string }[],
   };
 
   for (const order of staleOrders ?? []) {
     const reference = order.payment_transaction_id as string;
+    const orderAge = Date.now() - new Date(order.created_at).getTime();
+    const orderAgeMinutes = orderAge / (60 * 1000);
+    
     try {
       const verification = await verifyGeniusPayTransaction(reference);
       const remoteStatus = verification.data?.status;
@@ -91,9 +96,22 @@ export async function GET(req: NextRequest) {
         );
         results.failed.push(order.id);
       } else {
-        // Toujours 'pending' ou 'processing' côté GeniusPay — on la laisse
-        // pour la prochaine exécution.
-        results.stillPending.push(order.id);
+        // Toujours 'pending' ou 'processing' côté GeniusPay
+        // Si la commande est en pending depuis plus de AUTO_CANCEL_MINUTES, on l'annule automatiquement
+        if (orderAgeMinutes > AUTO_CANCEL_MINUTES) {
+          await markOrderNotPaid(
+            supabase,
+            order.id,
+            'cancelled',
+            reference,
+            { reason: 'Auto-cancelled after timeout', age: orderAgeMinutes },
+            'reconciliation'
+          );
+          results.autoCancelled.push(order.id);
+        } else {
+          // On la laisse pour la prochaine exécution
+          results.stillPending.push(order.id);
+        }
       }
     } catch (err) {
       // Erreur réseau/API GeniusPay pour cette commande : on continue avec

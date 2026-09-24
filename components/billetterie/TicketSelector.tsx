@@ -26,6 +26,8 @@ export function TicketSelector({ categories, paymentCancelled }: { categories: T
   const [errorMsg, setErrorMsg] = useState('');
   const [orderId, setOrderId] = useState<string | null>(null);
   const [amount, setAmount] = useState(0);
+  const [paymentStartTime, setPaymentStartTime] = useState<number | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState<number>(180); // 3 minutes en secondes
 
   // Afficher un message si le paiement a été annulé
   useEffect(() => {
@@ -46,9 +48,40 @@ export function TicketSelector({ categories, paymentCancelled }: { categories: T
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [step]);
 
+  // Compte à rebours pour le paiement
+  useEffect(() => {
+    if (step === 'paying' && paymentStartTime === null) {
+      setPaymentStartTime(Date.now());
+      setTimeRemaining(180);
+    }
+
+    if (step === 'paying' && paymentStartTime !== null) {
+      const interval = setInterval(() => {
+        const elapsed = (Date.now() - paymentStartTime) / 1000;
+        const remaining = Math.max(0, 180 - elapsed);
+        setTimeRemaining(remaining);
+
+        if (remaining <= 0) {
+          clearInterval(interval);
+          // Annuler automatiquement si le temps est écoulé
+          setStep('form');
+          setErrorMsg('Le délai de paiement de 3 minutes est écoulé. Veuillez recommencer le processus de paiement.');
+          setPaymentStartTime(null);
+        }
+      }, 1000);
+
+      return () => clearInterval(interval);
+    } else if (step !== 'paying') {
+      setPaymentStartTime(null);
+      setTimeRemaining(180);
+    }
+  }, [step, paymentStartTime]);
+
   function cancelPayment() {
     setStep('form');
     setErrorMsg('');
+    setPaymentStartTime(null);
+    setTimeRemaining(180);
   }
 
   function handlePhoneChange(raw: string) {
@@ -61,6 +94,8 @@ export function TicketSelector({ categories, paymentCancelled }: { categories: T
     setQuantity(1);
     setStep('form');
     setErrorMsg('');
+    setPaymentStartTime(null);
+    setTimeRemaining(180);
   }
 
   async function submitOrder(e: React.FormEvent) {
@@ -70,6 +105,8 @@ export function TicketSelector({ categories, paymentCancelled }: { categories: T
     try {
       // Afficher immédiatement le feedback visuel
       setStep('paying');
+      setPaymentStartTime(Date.now());
+      setTimeRemaining(180);
       
       setErrorMsg('');
       setNameError('');
@@ -416,6 +453,17 @@ export function TicketSelector({ categories, paymentCancelled }: { categories: T
             Complétez le paiement de {formatFcfa(amount)} dans la fenêtre GeniusPay.
             Si elle ne s&apos;est pas ouverte, vérifiez que les pop-ups sont autorisés.
           </p>
+          
+          <div className="mt-6 border border-or/30 bg-or/5 px-6 py-4">
+            <p className="font-body text-xs uppercase tracking-[0.15em] text-or/80">Temps restant</p>
+            <p className="mt-2 font-display text-2xl font-semibold text-or">
+              {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}
+            </p>
+            <p className="mt-2 font-body text-xs text-ivoire/50">
+              Passé ce délai, la commande sera annulée et vous devrez recommencer.
+            </p>
+          </div>
+          
           <button
             onClick={cancelPayment}
             className="mt-8 font-body text-xs uppercase tracking-[0.2em] text-ivoire/50 underline-offset-4 hover:text-or hover:underline"
