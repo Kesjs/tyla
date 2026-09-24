@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Lock } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { GoldFrame } from '@/components/GoldFrame';
 
 export default function ChangePasswordPage() {
@@ -44,7 +45,8 @@ export default function ChangePasswordPage() {
       // Marquer que l'utilisateur a changé son mot de passe
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        await supabase
+        const adminSupabase = createAdminClient();
+        await adminSupabase
           .from('admin_users')
           .update({ must_change_password: false })
           .eq('email', user.email);
