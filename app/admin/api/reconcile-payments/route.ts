@@ -17,9 +17,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
   }
 
-  // Vérifier que l'utilisateur est autorisé
-  const authorizedEmails = ['ken2001babatounde@gmail.com', 'eunice@tylafrica.com'];
-  if (!authorizedEmails.includes(user.email || '')) {
+  // Vérifier que l'utilisateur est autorisé via la table admin_users
+  const { data: adminUser } = await supabase
+    .from('admin_users')
+    .select('email')
+    .eq('email', user.email)
+    .single();
+  
+  if (!adminUser) {
     return NextResponse.json({ error: 'Non autorisé' }, { status: 403 });
   }
 
