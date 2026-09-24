@@ -40,8 +40,11 @@ function AdminLoginForm() {
     // Vérifier si c'est la première connexion (mot de passe par défaut)
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      // Vérifier si l'utilisateur doit changer son mot de passe
-      const { data: userData } = await supabase
+      // Utiliser le client admin pour la vérification
+      const { createAdminClient } = await import('@/lib/supabase/admin');
+      const adminSupabase = createAdminClient();
+      
+      const { data: userData } = await adminSupabase
         .from('admin_users')
         .select('must_change_password')
         .eq('email', user.email)
