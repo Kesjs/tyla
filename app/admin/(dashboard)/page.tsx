@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { formatFcfa, placesRemaining, type TicketCategory } from '@/lib/tickets';
-import { TrendingUp, Ticket, Users, Wallet } from 'lucide-react';
+import { TrendingUp, Ticket, Users, Wallet, RefreshCw } from 'lucide-react';
+import PaymentReconciliation from '@/components/admin/PaymentReconciliation';
 
 export const revalidate = 0;
 
@@ -16,6 +17,13 @@ export default async function AdminDashboardPage() {
     .from('tyla_orders')
     .select('total_amount, quantity')
     .eq('status', 'paid');
+
+  const { data: pendingOrders } = await supabase
+    .from('tyla_orders')
+    .select('id, created_at, total_amount, buyer_email')
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false })
+    .limit(10);
 
   const cats = (categories ?? []) as TicketCategory[];
   const totalRevenue = (paidOrders ?? []).reduce((sum, o) => sum + o.total_amount, 0);
@@ -75,6 +83,14 @@ export default async function AdminDashboardPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="mt-12">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-xl font-semibold text-ivoire">Réconciliation des paiements</h2>
+          <RefreshCw className="text-or" size={20} />
+        </div>
+        <PaymentReconciliation pendingOrders={pendingOrders ?? []} />
       </div>
     </div>
   );

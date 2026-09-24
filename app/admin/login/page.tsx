@@ -4,7 +4,7 @@ import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { GoldFrame } from '@/components/GoldFrame';
 
@@ -14,10 +14,9 @@ function AdminLoginForm() {
   const isBlocked = searchParams.get('blocked') === 'true';
   
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,14 +29,20 @@ function AdminLoginForm() {
     setLoading(true);
     setError('');
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/admin/auth/callback`
+      }
+    });
     setLoading(false);
+    
     if (error) {
-      setError('Email ou mot de passe incorrect.');
+      setError('Erreur lors de l\'envoi du lien de connexion.');
       return;
     }
-    router.push('/admin');
-    router.refresh();
+    
+    setSuccess(true);
   }
 
   return (
@@ -85,7 +90,7 @@ function AdminLoginForm() {
                 J&apos;AFFIRME 2026
               </h1>
               <p className="mt-4 font-body text-sm text-ivoire/60">
-                Accès réservé à l&apos;équipe T.Y.L.A
+                Connexion sécurisée par email. Un lien de connexion sera envoyé à votre adresse.
               </p>
             </motion.div>
 
@@ -115,31 +120,6 @@ function AdminLoginForm() {
                 </div>
               </div>
 
-              {/* Password field */}
-              <div className="group">
-                <label className="mb-2 block font-body text-xs uppercase tracking-[0.2em] text-ivoire/50">
-                  Mot de passe
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-ivoire/30 transition-colors group-focus-within:text-or" size={18} />
-                  <input
-                    required
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Mot de passe"
-                    className="w-full border border-taupe/30 bg-noir-soft py-3.5 pl-12 pr-12 font-body text-ivoire outline-none transition-all focus:border-or/50 focus:bg-noir-soft/80"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-ivoire/30 transition-colors hover:text-or"
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-              </div>
-
               {/* Blocked message */}
               {isBlocked && (
                 <motion.div
@@ -149,6 +129,19 @@ function AdminLoginForm() {
                 >
                   <p className="font-body text-sm text-porto-light">
                     Trop de tentatives de connexion. Votre IP a été temporairement bloquée pour des raisons de sécurité. Réessayez dans 15 minutes.
+                  </p>
+                </motion.div>
+              )}
+
+              {/* Success message */}
+              {success && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="rounded border border-or/30 bg-or/10 px-4 py-3"
+                >
+                  <p className="font-body text-sm text-or">
+                    Lien de connexion envoyé à {email}. Vérifiez votre boîte de réception et cliquez sur le lien pour vous connecter.
                   </p>
                 </motion.div>
               )}
@@ -167,9 +160,9 @@ function AdminLoginForm() {
               {/* Submit button */}
               <motion.button
                 type="submit"
-                disabled={loading}
-                whileHover={{ scale: loading ? 1 : 1.02 }}
-                whileTap={{ scale: loading ? 1 : 0.98 }}
+                disabled={loading || success}
+                whileHover={{ scale: loading || success ? 1 : 1.02 }}
+                whileTap={{ scale: loading || success ? 1 : 0.98 }}
                 className="group relative w-full overflow-hidden border border-or bg-or py-4 font-body text-xs uppercase tracking-[0.25em] text-noir transition-all hover:shadow-lg hover:shadow-or/20 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
@@ -180,10 +173,12 @@ function AdminLoginForm() {
                         animate={{ rotate: 360 }}
                         transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                       />
-                      Connexion...
+                      Envoi en cours...
                     </>
+                  ) : success ? (
+                    'Lien envoyé'
                   ) : (
-                    'Se connecter'
+                    'Envoyer le lien de connexion'
                   )}
                 </span>
               </motion.button>
