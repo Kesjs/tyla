@@ -6,7 +6,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: "Billetterie | J'AFFIRME Fashion Week 2026",
-  description: "Réservez votre place pour la J'AFFIRME Fashion Week 2026. Paiement sécurisé via Mobile Money et carte.",
+  description: "Découvrez les billets et réservez votre place pour les rendez-vous J'AFFIRME T.Y.L.A Fashion Week 2026.",
 };
 
 export const revalidate = 0;
@@ -57,9 +57,9 @@ export default async function BilletteriePage({
             Réservez votre place.
           </h1>
           <p className="mx-auto mt-5 max-w-xl font-body text-sm leading-relaxed text-ivoire/60">
-            24 octobre 2026 · Cotonou, Bénin. Paiement sécurisé par
-            Mobile Money ou carte. Votre billet (avec QR code) vous est
-            présenté immédiatement après paiement.
+            Retrouvez les billets du grand défilé J&apos;AFFIRME et les
+            rendez-vous qui font vivre la semaine de la mode à Cotonou.
+            Chaque bouton vous redirige vers la page officielle de réservation.
           </p>
           <a
             href="/billetterie/retrouver"
@@ -111,6 +111,32 @@ export default async function BilletteriePage({
         ) : (
           <TicketSelectorBoundary categories={categories} paymentCancelled={paymentCancelled} />
         )}
+
+        <Reveal delay={0.15} className="mx-auto mt-16 max-w-4xl border-t border-taupe/30 pt-10">
+          <div className="text-center">
+            <p className="font-body text-xs uppercase tracking-[0.3em] text-or">À vivre pendant la semaine</p>
+            <h2 className="mt-4 font-display text-2xl font-semibold text-ivoire sm:text-3xl">
+              Plus que le défilé, une programmation pour créer et transmettre.
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl font-body text-sm leading-relaxed text-ivoire/55">
+              Réservez directement chaque expérience sur YAP. Les informations
+              pratiques et les modalités d&apos;inscription sont indiquées sur la page de l&apos;événement.
+            </p>
+          </div>
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            {[
+              { eyebrow: '21 octobre · Hôtel Mavilla', title: 'Table ronde Designer & Identité', description: 'Créer sans copier : affirmer son style en puisant dans son héritage.', href: 'https://my-yap.com/events/table-ronde-designer-identite-creer-sans' },
+              { eyebrow: '20 octobre · Hôtel Mavilla', title: 'Workshop Mannequin', description: 'Transformer son héritage en force créative : carrière, terrain et stratégie.', href: 'https://my-yap.com/events/workshop-mannequin-transformer-son-herit' },
+            ].map((event) => (
+              <a key={event.href} href={event.href} target="_blank" rel="noopener noreferrer" className="group border border-taupe/40 p-6 text-left transition-colors hover:border-or">
+                <p className="font-body text-[10px] uppercase tracking-[0.2em] text-or/80">{event.eyebrow}</p>
+                <h3 className="mt-3 font-display text-xl font-semibold text-ivoire">{event.title}</h3>
+                <p className="mt-2 font-body text-sm leading-relaxed text-ivoire/55">{event.description}</p>
+                <span className="mt-5 inline-block font-body text-xs uppercase tracking-[0.18em] text-or underline-offset-4 group-hover:underline">Voir l&apos;événement →</span>
+              </a>
+            ))}
+          </div>
+        </Reveal>
       </div>
     </section>
   );
