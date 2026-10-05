@@ -123,13 +123,19 @@ export default async function BilletteriePage({
               pratiques et les modalités d&apos;inscription sont indiquées sur la page de l&apos;événement.
             </p>
           </div>
-          <div className="mt-8">
-            <a href="https://my-yap.com/events/workshop-photo" target="_blank" rel="noopener noreferrer" className="group block border border-taupe/40 p-6 text-left transition-colors hover:border-or">
-              <p className="font-body text-[10px] uppercase tracking-[0.2em] text-or/80">Atelier photo</p>
-              <h3 className="mt-3 font-display text-xl font-semibold text-ivoire">Workshop Photo</h3>
-              <p className="mt-2 font-body text-sm leading-relaxed text-ivoire/55">Retrouvez les informations pratiques et réservez directement votre place sur YAP.</p>
-              <span className="mt-5 inline-block font-body text-xs uppercase tracking-[0.18em] text-or underline-offset-4 group-hover:underline">Voir l&apos;événement →</span>
-            </a>
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {[
+              { eyebrow: 'Atelier photo', title: 'Workshop Photo', description: 'Retrouvez les informations pratiques et réservez directement votre place sur YAP.', href: 'https://my-yap.com/events/workshop-photo' },
+              { eyebrow: '21 octobre · Hôtel Mavilla', title: 'Table ronde Designer & Identité', description: 'Créer sans copier : affirmer son style en puisant dans son héritage.', href: 'https://my-yap.com/events/table-ronde-designer-identite-creer-sans' },
+              { eyebrow: '20 octobre · Hôtel Mavilla', title: 'Workshop Mannequin', description: 'Transformer son héritage en force créative : carrière, terrain et stratégie.', href: 'https://my-yap.com/events/workshop-mannequin-transformer-son-herit' },
+            ].map((event) => (
+              <a key={event.href} href={event.href} target="_blank" rel="noopener noreferrer" className="group border border-taupe/40 p-6 text-left transition-colors hover:border-or">
+                <p className="font-body text-[10px] uppercase tracking-[0.2em] text-or/80">{event.eyebrow}</p>
+                <h3 className="mt-3 font-display text-xl font-semibold text-ivoire">{event.title}</h3>
+                <p className="mt-2 font-body text-sm leading-relaxed text-ivoire/55">{event.description}</p>
+                <span className="mt-5 inline-block font-body text-xs uppercase tracking-[0.18em] text-or underline-offset-4 group-hover:underline">Voir l&apos;événement →</span>
+              </a>
+            ))}
           </div>
         </Reveal>
       </div>

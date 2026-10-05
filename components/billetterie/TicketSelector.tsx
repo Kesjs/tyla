@@ -7,9 +7,11 @@ import { type TicketCategory, formatFcfa } from '@/lib/tickets';
 const MAIN_RESERVATION_URL = 'https://my-yap.com/events/jaffirme-tyla-fashion-week';
 
 export function TicketSelector({ categories }: { categories: TicketCategory[]; paymentCancelled?: boolean }) {
+  const visibleCategories = categories.filter((cat) => !cat.name.match(/étudiant|student/i));
+
   return (
     <div className="grid gap-6 sm:grid-cols-2">
-      {categories.map((cat, i) => {
+      {visibleCategories.map((cat, i) => {
         let desc = cat.description || '';
         if (cat.name.match(/vip gold/i)) desc = desc.replace(/Professionnels établis,\s*diaspora,\s*mentors/i, '');
         if (cat.name.match(/standard/i)) desc = desc.replace(/Jeunes professionnels,\s*créatifs,\s*entrepreneurs,\s*grand public/i, '');
